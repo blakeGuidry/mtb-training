@@ -1,1476 +1,2491 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MTB Race Training Plan</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Warm Neutral (Stone) with Forest & Amber Accents -->
-    <!-- Application Structure Plan: A tabbed, single-page application. The main navigation segments the 6-month+ plan into digestible, race-specific phases (Fat Chuck's, Relay, BCBR Base, BCBR Build) and a "Workout Library". This structure is chosen over a single linear calendar to prevent overwhelming the user. A "Dashboard" tab provides a high-level visual overview of the entire plan's training load. Each phase tab contains its own sub-navigation for selecting specific weeks, displaying only one week of workouts at a time. This hierarchical structure (App -> Phase -> Week -> Day) makes the dense, day-by-day plan highly manageable and intuitive to navigate. The Workout Library offloads detailed (e.g., strength) information, keeping the calendar clean and concise. -->
-    <!-- Visualization & Content Choices:
-        - Report Info: Full 28-week training load progression (PDF Tables 8.1-8.28) -> Goal: Show periodization (build/rest cycles) -> Viz: Line Chart (Chart.js) -> Interaction: View-only on Dashboard -> Justification: Provides an immediate, high-level understanding of the entire plan's intensity ramp as defined in the source PDF.
-        - Report Info: Phase goals (PDF Sections 2 & 3) -> Goal: Show training focus for each phase -> Viz: Donut Chart (Chart.js) -> Interaction: A unique chart is generated on each Phase tab, specific to that phase's training goals (e.g., "Base" = high Z2) -> Justification: Visually communicates the *purpose* of each training block from the PDF.
-        - Report Info: Day-by-day workout details (PDF Tables 8.1-8.28) -> Goal: Provide specific daily instructions -> Viz: Structured HTML/Tailwind cards -> Interaction: Cards are organized into weekly grids, which are shown/hidden via JS-powered "Week" buttons within each Phase tab -> Justification: This is the core interaction, making the PDF's dense tables digestible one week at a time.
-        - Report Info: Strength routines & zone data (PDF Tables 1-7, Sec 1.4) -> Goal: Provide a reference library -> Viz: Collapsible HTML `<details>` elements -> Interaction: User clicks to expand desired routine in the "Workout Library" tab -> Justification: Fulfills the "comprehensive" request by directly pulling the PDF's reference tables, keeping the calendar clean.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-        }
+      body {
+        font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+          "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+          "Noto Color Emoji";
+      }
 
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 300px;
+        max-height: 400px;
+      }
+
+      @media (min-width: 768px) {
         .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
+          height: 350px;
         }
+      }
 
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
+      /* Plain CSS for nav-tab */
+      .nav-tab {
+        padding-left: 0.75rem;
+        /* px-3 */
+        padding-right: 0.75rem;
+        /* px-3 */
+        padding-top: 0.5rem;
+        /* py-2 */
+        padding-bottom: 0.5rem;
+        /* py-2 */
+        font-size: 0.875rem;
+        /* text-sm */
+        line-height: 1.25rem;
+        font-weight: 500;
+        /* font-medium */
+        text-align: center;
+        color: rgb(71 85 105);
+        /* text-slate-600 */
+        border-bottom-width: 2px;
+        border-color: transparent;
+        border-top-left-radius: 0.5rem;
+        /* rounded-t-lg */
+        border-top-right-radius: 0.5rem;
+        /* rounded-t-lg */
+        transition-property: color, border-color;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+        cursor: pointer;
+      }
 
-        /* Plain CSS for nav-tab */
+      .nav-tab:hover {
+        color: rgb(4 120 87);
+        /* hover:text-emerald-700 */
+        border-color: rgb(4 120 87);
+        /* hover:border-emerald-700 */
+      }
+
+      @media (min-width: 640px) {
+        /* sm: */
         .nav-tab {
-            padding-left: 0.75rem;
-            /* px-3 */
-            padding-right: 0.75rem;
-            /* px-3 */
-            padding-top: 0.5rem;
-            /* py-2 */
-            padding-bottom: 0.5rem;
-            /* py-2 */
-            font-size: 0.875rem;
-            /* text-sm */
-            line-height: 1.25rem;
-            font-weight: 500;
-            /* font-medium */
-            text-align: center;
-            color: rgb(71 85 105);
-            /* text-slate-600 */
-            border-bottom-width: 2px;
-            border-color: transparent;
-            border-top-left-radius: 0.5rem;
-            /* rounded-t-lg */
-            border-top-right-radius: 0.5rem;
-            /* rounded-t-lg */
-            transition-property: color, border-color;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 200ms;
-            cursor: pointer;
+          padding-left: 1rem;
+          /* sm:px-4 */
+          padding-right: 1rem;
+          /* sm:px-4 */
+          padding-top: 0.75rem;
+          /* sm:py-3 */
+          padding-bottom: 0.75rem;
+          /* sm:py-3 */
+          font-size: 1rem;
+          /* sm:text-base */
+          line-height: 1.5rem;
         }
+      }
 
-        .nav-tab:hover {
-            color: rgb(4 120 87);
-            /* hover:text-emerald-700 */
-            border-color: rgb(4 120 87);
-            /* hover:border-emerald-700 */
-        }
+      .nav-tab.active {
+        color: rgb(4 120 87);
+        /* text-emerald-700 */
+        border-color: rgb(4 120 87);
+        /* border-emerald-700 */
+      }
 
-        @media (min-width: 640px) {
+      /* Plain CSS for week-nav-button */
+      .week-nav-button {
+        padding-left: 0.75rem;
+        /* px-3 */
+        padding-right: 0.75rem;
+        /* px-3 */
+        padding-top: 0.5rem;
+        /* py-2 */
+        padding-bottom: 0.5rem;
+        /* py-2 */
+        font-size: 0.75rem;
+        /* text-xs */
+        line-height: 1rem;
+        font-weight: 500;
+        /* font-medium */
+        text-align: center;
+        color: rgb(51 65 85);
+        /* text-slate-700 */
+        background-color: rgb(255 255 255);
+        /* bg-white */
+        border-width: 1px;
+        border-color: rgb(203 213 225);
+        /* border-slate-300 */
+        border-radius: 0.375rem;
+        /* rounded-md */
+        cursor: pointer;
+      }
 
-            /* sm: */
-            .nav-tab {
-                padding-left: 1rem;
-                /* sm:px-4 */
-                padding-right: 1rem;
-                /* sm:px-4 */
-                padding-top: 0.75rem;
-                /* sm:py-3 */
-                padding-bottom: 0.75rem;
-                /* sm:py-3 */
-                font-size: 1rem;
-                /* sm:text-base */
-                line-height: 1.5rem;
-            }
-        }
+      .week-nav-button:hover {
+        background-color: rgb(248 250 252);
+        /* hover:bg-slate-50 */
+      }
 
-        .nav-tab.active {
-            color: rgb(4 120 87);
-            /* text-emerald-700 */
-            border-color: rgb(4 120 87);
-            /* border-emerald-700 */
-        }
+      .week-nav-button:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 1px
+          var(--tw-ring-offset-color);
+        /* focus:ring-offset-1 */
+        --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+          calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+        /* focus:ring-2 */
+        box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+          var(--tw-shadow, 0 0 #0000);
+        --tw-ring-color: rgb(16 185 129 / 0.5);
+        /* focus:ring-emerald-500 */
+      }
 
-        /* Plain CSS for week-nav-button */
+      @media (min-width: 640px) {
+        /* sm: */
         .week-nav-button {
-            padding-left: 0.75rem;
-            /* px-3 */
-            padding-right: 0.75rem;
-            /* px-3 */
-            padding-top: 0.5rem;
-            /* py-2 */
-            padding-bottom: 0.5rem;
-            /* py-2 */
-            font-size: 0.75rem;
-            /* text-xs */
-            line-height: 1rem;
-            font-weight: 500;
-            /* font-medium */
-            text-align: center;
-            color: rgb(51 65 85);
-            /* text-slate-700 */
-            background-color: rgb(255 255 255);
-            /* bg-white */
-            border-width: 1px;
-            border-color: rgb(203 213 225);
-            /* border-slate-300 */
-            border-radius: 0.375rem;
-            /* rounded-md */
-            cursor: pointer;
+          font-size: 0.875rem;
+          /* sm:text-sm */
+          line-height: 1.25rem;
         }
+      }
 
-        .week-nav-button:hover {
-            background-color: rgb(248 250 252);
-            /* hover:bg-slate-50 */
-        }
+      .week-nav-button.active {
+        background-color: rgb(4 120 87);
+        /* bg-emerald-700 */
+        color: rgb(255 255 255);
+        /* text-white */
+        border-color: rgb(4 120 87);
+        /* border-emerald-700 */
+      }
 
-        .week-nav-button:focus {
-            outline: 2px solid transparent;
-            outline-offset: 2px;
-            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 1px var(--tw-ring-offset-color);
-            /* focus:ring-offset-1 */
-            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-            /* focus:ring-2 */
-            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
-            --tw-ring-color: rgb(16 185 129 / 0.5);
-            /* focus:ring-emerald-500 */
-        }
+      /* Plain CSS for page-content */
+      .page-content {
+        padding: 1rem;
+        /* p-4 */
+      }
 
-        @media (min-width: 640px) {
-
-            /* sm: */
-            .week-nav-button {
-                font-size: 0.875rem;
-                /* sm:text-sm */
-                line-height: 1.25rem;
-            }
-        }
-
-        .week-nav-button.active {
-            background-color: rgb(4 120 87);
-            /* bg-emerald-700 */
-            color: rgb(255 255 255);
-            /* text-white */
-            border-color: rgb(4 120 87);
-            /* border-emerald-700 */
-        }
-
-        /* Plain CSS for page-content */
+      @media (min-width: 768px) {
+        /* md: */
         .page-content {
-            padding: 1rem;
-            /* p-4 */
+          padding: 1.5rem;
+          /* md:p-6 */
         }
+      }
 
-        @media (min-width: 768px) {
+      /* Plain CSS for day-card */
+      .day-card {
+        background-color: rgb(255 255 255);
+        /* bg-white */
+        border-radius: 0.5rem;
+        /* rounded-lg */
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        /* shadow-sm */
+        border-width: 1px;
+        border-color: rgb(226 232 240);
+        /* border-slate-200 */
+        padding: 0.75rem;
+        /* p-3 */
+        display: flex;
+        flex-direction: column;
+      }
 
-            /* md: */
-            .page-content {
-                padding: 1.5rem;
-                /* md:p-6 */
-            }
-        }
+      .day-card h4 {
+        font-weight: 600;
+        /* font-semibold */
+        color: rgb(30 41 59);
+        /* text-slate-800 */
+        font-size: 0.875rem;
+        /* text-sm */
+        line-height: 1.25rem;
+        margin-bottom: 0.25rem;
+        /* mb-1 */
+      }
 
-        /* Plain CSS for day-card */
-        .day-card {
-            background-color: rgb(255 255 255);
-            /* bg-white */
-            border-radius: 0.5rem;
-            /* rounded-lg */
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            /* shadow-sm */
-            border-width: 1px;
-            border-color: rgb(226 232 240);
-            /* border-slate-200 */
-            padding: 0.75rem;
-            /* p-3 */
-            display: flex;
-            flex-direction: column;
-        }
+      .day-card p {
+        font-size: 0.75rem;
+        /* text-xs */
+        line-height: 1rem;
+        color: rgb(71 85 105);
+        /* text-slate-600 */
+        margin-bottom: 0.5rem;
+        /* mb-2 */
+        flex-grow: 1;
+      }
 
-        .day-card h4 {
-            font-weight: 600;
-            /* font-semibold */
-            color: rgb(30 41 59);
-            /* text-slate-800 */
-            font-size: 0.875rem;
-            /* text-sm */
-            line-height: 1.25rem;
-            margin-bottom: 0.25rem;
-            /* mb-1 */
-        }
+      /* Plain CSS for details/summary */
+      details > summary {
+        font-size: 1.125rem;
+        /* text-lg */
+        line-height: 1.75rem;
+        font-weight: 600;
+        /* font-semibold */
+        color: rgb(30 41 59);
+        /* text-slate-800 */
+        cursor: pointer;
+        transition: color 0.2s;
+      }
 
-        .day-card p {
-            font-size: 0.75rem;
-            /* text-xs */
-            line-height: 1rem;
-            color: rgb(71 85 105);
-            /* text-slate-600 */
-            margin-bottom: 0.5rem;
-            /* mb-2 */
-            flex-grow: 1;
-        }
+      details > summary:hover {
+        color: rgb(4 120 87);
+        /* hover:text-emerald-700 */
+      }
 
-        /* Plain CSS for details/summary */
-        details>summary {
-            font-size: 1.125rem;
-            /* text-lg */
-            line-height: 1.75rem;
-            font-weight: 600;
-            /* font-semibold */
-            color: rgb(30 41 59);
-            /* text-slate-800 */
-            cursor: pointer;
-            transition: color 0.2s;
-        }
+      details > div {
+        padding: 1rem;
+        /* p-4 */
+        background-color: rgb(255 255 255);
+        /* bg-white */
+        border-radius: 0.375rem;
+        /* rounded-md */
+        box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+        /* shadow-inner */
+        margin-top: 0.5rem;
+        /* mt-2 */
+      }
 
-        details>summary:hover {
-            color: rgb(4 120 87);
-            /* hover:text-emerald-700 */
-        }
+      /* Styles for tables in workout library */
+      .library-table {
+        width: 100%;
+        text-align: left;
+        font-size: 0.875rem;
+        /* text-sm */
+        color: rgb(71 85 105);
+        /* text-slate-600 */
+      }
 
-        details>div {
-            padding: 1rem;
-            /* p-4 */
-            background-color: rgb(255 255 255);
-            /* bg-white */
-            border-radius: 0.375rem;
-            /* rounded-md */
-            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
-            /* shadow-inner */
-            margin-top: 0.5rem;
-            /* mt-2 */
-        }
+      .library-table th {
+        padding: 0.5rem 1rem;
+        /* px-4 py-2 */
+        background-color: rgb(241 245 249);
+        /* bg-slate-100 */
+        color: rgb(51 65 85);
+        /* text-slate-700 */
+        font-weight: 600;
+        /* font-semibold */
+      }
 
-        /* Styles for tables in workout library */
-        .library-table {
-            width: 100%;
-            text-align: left;
-            font-size: 0.875rem;
-            /* text-sm */
-            color: rgb(71 85 105);
-            /* text-slate-600 */
-        }
+      .library-table td {
+        padding: 0.5rem 1rem;
+        /* px-4 py-2 */
+        border-bottom-width: 1px;
+        border-color: rgb(226 232 240);
+        /* border-slate-200 */
+      }
 
-        .library-table th {
-            padding: 0.5rem 1rem;
-            /* px-4 py-2 */
-            background-color: rgb(241 245 249);
-            /* bg-slate-100 */
-            color: rgb(51 65 85);
-            /* text-slate-700 */
-            font-weight: 600;
-            /* font-semibold */
-        }
+      /* New class for context text blocks */
+      .context-block {
+        background-color: rgb(248 250 252);
+        /* bg-slate-50 */
+        border-left-width: 4px;
+        border-color: rgb(203 213 225);
+        /* border-slate-300 */
+        padding: 1rem;
+        /* p-4 */
+        margin-bottom: 1.5rem;
+        /* mb-6 */
+        border-radius: 0.25rem;
+        /* rounded-r-md */
+      }
 
-        .library-table td {
-            padding: 0.5rem 1rem;
-            /* px-4 py-2 */
-            border-bottom-width: 1px;
-            border-color: rgb(226 232 240);
-            /* border-slate-200 */
-        }
+      .context-block h3 {
+        font-size: 1.125rem;
+        /* text-lg */
+        font-weight: 600;
+        /* font-semibold */
+        color: rgb(30 41 59);
+        /* text-slate-800 */
+        margin-bottom: 0.5rem;
+        /* mb-2 */
+      }
 
-        /* New class for context text blocks */
-        .context-block {
-            background-color: rgb(248 250 252);
-            /* bg-slate-50 */
-            border-left-width: 4px;
-            border-color: rgb(203 213 225);
-            /* border-slate-300 */
-            padding: 1rem;
-            /* p-4 */
-            margin-bottom: 1.5rem;
-            /* mb-6 */
-            border-radius: 0.25rem;
-            /* rounded-r-md */
-        }
-
-        .context-block h3 {
-            font-size: 1.125rem;
-            /* text-lg */
-            font-weight: 600;
-            /* font-semibold */
-            color: rgb(30 41 59);
-            /* text-slate-800 */
-            margin-bottom: 0.5rem;
-            /* mb-2 */
-        }
-
-        .context-block p {
-            font-size: 0.875rem;
-            /* text-sm */
-            color: rgb(71 85 105);
-            /* text-slate-600 */
-            line-height: 1.5;
-            /* leading-relaxed */
-        }
+      .context-block p {
+        font-size: 0.875rem;
+        /* text-sm */
+        color: rgb(71 85 105);
+        /* text-slate-600 */
+        line-height: 1.5;
+        /* leading-relaxed */
+      }
     </style>
-</head>
+  </head>
 
-<body class="bg-stone-50 text-slate-700">
-
+  <body class="bg-stone-50 text-slate-700">
     <header class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
-                The 28-Week Mountain Bike Peak Performance Plan
-            </h1>
-            <p class="text-sm sm:text-base text-slate-600">Your interactive guide to the training plan.</p>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">
+          The 30-Week Mountain Bike Peak Performance Plan
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600">
+          Your interactive guide to the training plan.
+        </p>
+      </div>
+      <nav class="border-b border-slate-200">
+        <div
+          class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 -mb-px flex flex-wrap justify-center sm:justify-start gap-x-2 sm:gap-x-4"
+        >
+          <button class="nav-tab active" data-page="page-dashboard">
+            Dashboard
+          </button>
+          <button class="nav-tab" data-page="page-phase1">
+            Phase 1: Winter Campaign (Wk 1-9)
+          </button>
+          <button class="nav-tab" data-page="page-phase2">
+            Phase 2: BCBR Base (Wk 10-18)
+          </button>
+          <button class="nav-tab" data-page="page-phase3">
+            Phase 3: BCBR Build & Peak (Wk 19-30)
+          </button>
+          <button class="nav-tab" data-page="page-library">
+            Workout Library
+          </button>
         </div>
-        <nav class="border-b border-slate-200">
-            <div
-                class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 -mb-px flex flex-wrap justify-center sm:justify-start gap-x-2 sm:gap-x-4">
-                <button class="nav-tab active" data-page="page-dashboard">Dashboard</button>
-                <button class="nav-tab" data-page="page-phase1">Phase 1: Winter Campaign (Wk 1-7)</button>
-                <button class="nav-tab" data-page="page-phase2">Phase 2: BCBR Base (Wk 8-16)</button>
-                <button class="nav-tab" data-page="page-phase3">Phase 3: BCBR Build & Peak (Wk 17-28)</button>
-                <button class="nav-tab" data-page="page-library">Workout Library</button>
-            </div>
-        </nav>
+      </nav>
     </header>
 
-    <main id="content-area" class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
-
-        <div id="page-dashboard" class="page-content">
-            <div class="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-4">Training Plan Overview</h2>
-                <p class="text-slate-600 mb-6">
-                    This dashboard provides a visual overview of the 28-week plan. The plan is divided into three main
-                    phases, accessible via the tabs above. This main chart shows the planned weekly training volume (in
-                    hours) across the entire 28-week plan, illustrating the build, rest, and taper periods as defined in
-                    your PDF document.
-                </p>
-                <div class="chart-container">
-                    <canvas id="trainingLoadChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-500 mt-2">
-                    Chart reflects total weekly hours from Tables 8.1 - 8.28.
-                </p>
-            </div>
+    <main
+      id="content-area"
+      class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6"
+    >
+      <div id="page-dashboard" class="page-content">
+        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+          <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-4">
+            Training Plan Overview
+          </h2>
+          <p class="text-slate-600 mb-6">
+            This dashboard provides a visual overview of the 30-week plan. The
+            plan is divided into three main phases, accessible via the tabs
+            above. This main chart shows the planned weekly training volume (in
+            hours) across the entire 30-week plan, illustrating the build, rest,
+            and taper periods as defined in your PDF document.
+          </p>
+          <div class="chart-container">
+            <canvas id="trainingLoadChart"></canvas>
+          </div>
+          <p class="text-xs text-center text-slate-500 mt-2">
+            Chart reflects total weekly hours from Tables 8.1 - 8.30.
+          </p>
         </div>
+      </div>
 
-        <div id="page-phase1" class="page-content hidden">
-            <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
-                <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">Phase 1: The Winter Campaign (Weeks
-                    1-7)</h2>
+      <div id="page-phase1" class="page-content hidden">
+        <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+          <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">
+            Phase 1: The Winter Campaign (Weeks 1-9)
+          </h2>
 
-                <!-- NEW: Mesocycle Context Blocks -->
-                <div class="context-block mt-4">
-                    <h3 class="font-semibold text-slate-800">Mesocycle 1 (Weeks 1-4): Build & Peak</h3>
-                    <p class="text-sm text-slate-600 mb-3">
-                        The goal of this 4-week block is to build specific fitness for the 45-mile Fat Chuck's Revenge
-                        race. The "non-stop up and down" nature of this course requires high muscular endurance and the
-                        ability to sustain "comfortably hard" (Z3) to "hard" (Z4) efforts. The training structure is
-                        three weeks of loading followed by one week of recovery and taper (a 3-on, 1-off protocol).
-                    </p>
-                    <h3 class="font-semibold text-slate-800">Mesocycle 2 (Week 5): Taper & Race</h3>
-                    <p class="text-sm text-slate-600 mb-3">
-                        This week is a taper, designed to shed accumulated fatigue from the build block while retaining
-                        fitness. The protocol involves a significant reduction in training volume, but a retention of
-                        high intensity through short "opener" workouts.
-                    </p>
-                    <h3 class="font-semibold text-slate-800">Mesocycle 3 (Weeks 6-7): Recover & Reload</h3>
-                    <p class="text-sm text-slate-600">
-                        This 2-week block bridges the two winter races. Week 6 is a dedicated recovery week
-                        (low-intensity Z1/Z2). Week 7 is a "reload" block to prepare for the Excruciate Exam relay,
-                        using "two-a-day" training to simulate the "go hard, recover, go hard again" sequence of a
-                        relay.
-                    </p>
-                </div>
+          <div class="context-block mt-4">
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 1 - Build & Peak (Weeks 1-4)
+            </h3>
+            <p class="text-sm text-slate-600 mb-3">
+              The goal of this 4-week block is to build specific fitness for the
+              45-mile Fat Chuck's Revenge race. Focus is on sustained threshold
+              efforts (Z3/Z4) and muscular endurance (Climb Rides). The
+              structure is three weeks of loading followed by one week of
+              recovery and taper (a 3-on, 1-off protocol).
+            </p>
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 2 - Mini-Build & Race (Weeks 5-7)
+            </h3>
+            <p class="text-sm text-slate-600 mb-3">
+              This 3-week block includes a mini-build (Wk 5-6) followed by the
+              taper and race (Wk 7: Fat Chuck's). The taper reduces volume
+              significantly while maintaining intensity through short "opener"
+              workouts to shed fatigue and keep the neuromuscular system primed.
+            </p>
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 3 - Recover & Reload (Weeks 8-9)
+            </h3>
+            <p class="text-sm text-slate-600">
+              This 2-week block bridges the two winter races. Week 8 is a
+              dedicated recovery week (low-intensity Z1/Z2). Week 9 is a
+              "reload" block to prepare for the Excruciate Exam relay, using a
+              "two-a-day" training session to simulate the repeated,
+              high-intensity demands of a relay.
+            </p>
+          </div>
 
-                <div class="chart-container" style="max-height: 250px;">
-                    <canvas id="phase1IntensityChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-500 mt-2">
-                    Phase 1 training focus by Heart Rate/Power Zone.
-                </p>
-            </div>
-            <div id="phase1-nav" class="flex flex-wrap gap-2 mb-4"></div>
-            <div id="phase1-content"></div>
+          <div class="chart-container" style="max-height: 250px">
+            <canvas id="phase1IntensityChart"></canvas>
+          </div>
+          <p class="text-xs text-center text-slate-500 mt-2">
+            Phase 1 training focus by Heart Rate/Power Zone.
+          </p>
         </div>
+        <div id="phase1-nav" class="flex flex-wrap gap-2 mb-4"></div>
+        <div id="phase1-content"></div>
+      </div>
 
-        <div id="page-phase2" class="page-content hidden">
-            <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
-                <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">Phase 2: BC Bike Race - Base (Weeks
-                    8-16)</h2>
+      <div id="page-phase2" class="page-content hidden">
+        <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+          <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">
+            Phase 2: BC Bike Race - Base (Weeks 10-18)
+          </h2>
 
-                <!-- NEW: Mesocycle Context Blocks -->
-                <div class="context-block mt-4">
-                    <h3 class="font-semibold text-slate-800">Mesocycle 4 (Weeks 8-11): Transition & Base 1</h3>
-                    <p class="text-sm text-slate-600 mb-3">
-                        Following the winter races, Week 8 is a critical transition week, dedicated entirely to active
-                        recovery. This allows for full physical and mental regeneration. Weeks 9-11 commence Base Phase
-                        1. The exclusive focus is re-establishing the aerobic foundation by accumulating significant
-                        time in Zone 2. The strength program also resets to Phase 2 (Maximum Strength).
-                    </p>
-                    <h3 class="font-semibold text-slate-800">Mesocycle 5 (Weeks 12-16): Base 2</h3>
-                    <p class="text-sm text-slate-600">
-                        This is the most important training block for stage race success. The primary goal is extending
-                        aerobic endurance. This is achieved by progressively increasing the duration of the weekend long
-                        ride, building from 3 hours to 5 and eventually 6 hours. These long rides train metabolic
-                        efficiency (fat burning) and build the deep durability required for a 7-day event.
-                    </p>
-                </div>
+          <div class="context-block mt-4">
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 4 - Transition & Base 1 (Weeks 10-13)
+            </h3>
+            <p class="text-sm text-slate-600 mb-3">
+              Week 10 is a critical transition week, dedicated entirely to
+              active recovery after the winter races. Weeks 11-13 commence Base
+              Phase 1. The exclusive focus is re-establishing the aerobic
+              foundation by accumulating significant time in <b>Zone 2</b>. The
+              strength program transitions to <b>Phase 2 (Maximum Strength)</b>.
+            </p>
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 5 - Base 2 (Weeks 14-18)
+            </h3>
+            <p class="text-sm text-slate-600">
+              This is the most important training block for stage race success.
+              The primary goal is extending <b>aerobic endurance</b> and
+              metabolic efficiency (fat burning). This is achieved by
+              progressively increasing the duration of the weekend long ride,
+              building from 3 hours to 5 hours, with a <b>recovery week</b> (Wk
+              18) following the high-volume block. Mid-week rides focus on Z2
+              and Z3.
+            </p>
+          </div>
 
-                <div class="chart-container" style="max-height: 250px;">
-                    <canvas id="phase2IntensityChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-500 mt-2">
-                    Phase 2 training focus by Heart Rate/Power Zone.
-                </p>
-            </div>
-            <div id="phase2-nav" class="flex flex-wrap gap-2 mb-4"></div>
-            <div id="phase2-content"></div>
+          <div class="chart-container" style="max-height: 250px">
+            <canvas id="phase2IntensityChart"></canvas>
+          </div>
+          <p class="text-xs text-center text-slate-500 mt-2">
+            Phase 2 training focus by Heart Rate/Power Zone.
+          </p>
         </div>
+        <div id="phase2-nav" class="flex flex-wrap gap-2 mb-4"></div>
+        <div id="phase2-content"></div>
+      </div>
 
-        <div id="page-phase3" class="page-content hidden">
-            <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
-                <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">Phase 3: BCBR - Build & Peak (Weeks
-                    17-28)</h2>
+      <div id="page-phase3" class="page-content hidden">
+        <div class="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
+          <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-2">
+            Phase 3: BCBR - Build & Peak (Weeks 19-30)
+          </h2>
 
-                <!-- NEW: Mesocycle Context Blocks -->
-                <div class="context-block mt-4">
-                    <h3 class="font-semibold text-slate-800">Mesocycle 6 (Weeks 17-20): Build 1</h3>
-                    <p class="text-sm text-slate-600 mb-3">
-                        With a massive aerobic base established, this mesocycle begins to "build the ceiling" by
-                        introducing high-intensity training. The focus shifts from duration to intensity, specifically
-                        Z4 (Lactate Threshold) intervals. The strength program shifts in parallel to Phase 3 (Muscular
-                        Endurance).
-                    </p>
-                    <h3 class="font-semibold text-slate-800">Mesocycle 7 (Weeks 21-24): Build 2 / Specialty</h3>
-                    <p class="text-sm text-slate-600 mb-3">
-                        This is the peak training block. The focus is on Z5 (VO2 Max) intervals and "Stage Race
-                        Simulation" blocks on the weekend (e.g., a "Kitchen Sink" ride on Saturday followed by a
-                        "Fatigued Endurance" ride on Sunday). This trains the body's ability to perform on subsequent
-                        days with significant fatigue.
-                    </p>
-                    <h3 class="font-semibold text-slate-800">Mesocycles 8 & 9 (Weeks 25-28): Taper & Peak</h3>
-                    <p class="text-sm text-slate-600">
-                        Following the peak block, a 3-week taper (Weeks 25-27) is required to shed all fatigue. The
-                        entire focus then shifts from fitness to execution and recovery for the 7-day BC Bike Race (Week
-                        28).
-                    </p>
-                </div>
+          <div class="context-block mt-4">
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 6 - Build 1 (Weeks 19-22)
+            </h3>
+            <p class="text-sm text-slate-600 mb-3">
+              With the base established, this mesocycle begins to "build the
+              ceiling" by introducing high-intensity training. The focus shifts
+              from duration to intensity, specifically
+              <b>Z4 (Lactate Threshold) intervals</b>. The weekend long ride
+              incorporates sustained <b>Z3 (Tempo)</b> and <b>Z4</b> efforts to
+              simulate race-pace climbing. The strength program shifts to
+              <b>Phase 3 (Strength Maintenance - Heavy)</b>.
+            </p>
+            <h3 class="font-semibold text-slate-800">
+              Mesocycle 7 - Build 2 / Specialty (Weeks 23-26)
+            </h3>
+            <p class="text-sm text-slate-600 mb-3">
+              This is the peak training block. The focus is on
+              <b>Z5 (VO2 Max) intervals</b> during the week and
+              <b>Stage Race Simulation</b> blocks on the weekend (back-to-back
+              long, hard days). This trains the body's ability to perform on
+              subsequent days with significant fatigue. The block ends with a
+              necessary recovery week (Wk 26).
+            </p>
+            <h3 class="font-semibold text-slate-800">
+              Mesocycles 8 & 9 - Taper & Peak (Weeks 27-30)
+            </h3>
+            <p class="text-sm text-slate-600">
+              A 3-week taper (Weeks 27-29) sheds all accumulated fatigue while
+              retaining fitness through short, high-intensity "opener" workouts.
+              The training volume is minimal by Week 29 to prime the body for
+              the <b>BC Bike Race (Week 30)</b>.
+            </p>
+          </div>
 
-                <!-- NEW: Race Week Protocol -->
-                <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-md mb-6">
-                    <h3 class="text-lg font-semibold text-amber-900 mb-2">BCBR Daily Race/Recovery Protocol (Sec 3.6)
-                    </h3>
-                    <ol class="list-decimal list-inside space-y-1 text-sm text-amber-800">
-                        <li><strong>Race:</strong> Execute nutrition and pacing plan.</li>
-                        <li><strong>Post-Race (0-5 min):</strong> Finish, begin rehydrating.</li>
-                        <li><strong>Post-Race (5-20 min):</strong> Perform a 15-minute cool-down spin in Z1.</li>
-                        <li><strong>Post-Race (20-30 min):</strong> Ingest immediate recovery nutrition (e.g., 30g
-                            protein, 60g carbs).</li>
-                        <li><strong>Post-Race (30-90 min):</strong> Rehydrate, stretch, foam roll, clean up.</li>
-                        <li><strong>Post-Race (2+ hours):</strong> Eat a full, balanced meal. Prepare equipment. Rest.
-                        </li>
-                    </ol>
-                </div>
+          <div
+            class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-md mb-6"
+          >
+            <h3 class="text-lg font-semibold text-amber-900 mb-2">
+              BCBR Daily Race/Recovery Protocol (Sec 3.6)
+            </h3>
+            <ol
+              class="list-decimal list-inside space-y-1 text-sm text-amber-800"
+            >
+              <li><strong>Race:</strong> Execute nutrition and pacing plan.</li>
+              <li>
+                <strong>Post-Race (0-5 min):</strong> Finish, begin rehydrating.
+              </li>
+              <li>
+                <strong>Post-Race (5-20 min):</strong> Perform a 15-minute
+                cool-down spin in Z1.
+              </li>
+              <li>
+                <strong>Post-Race (20-30 min):</strong> Ingest immediate
+                recovery nutrition (e.g., 30g protein, 60g carbs).
+              </li>
+              <li>
+                <strong>Post-Race (30-90 min):</strong> Rehydrate, stretch, foam
+                roll, clean up.
+              </li>
+              <li>
+                <strong>Post-Race (2+ hours):</strong> Eat a full, balanced
+                meal. Prepare equipment. Rest.
+              </li>
+            </ol>
+          </div>
 
-                <div class="chart-container" style="max-height: 250px;">
-                    <canvas id="phase3IntensityChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-500 mt-2">
-                    Phase 3 training focus by Heart Rate/Power Zone.
-                </p>
-            </div>
-            <div id="phase3-nav" class="flex flex-wrap gap-2 mb-4"></div>
-            <div id="phase3-content"></div>
+          <div class="chart-container" style="max-height: 250px">
+            <canvas id="phase3IntensityChart"></canvas>
+          </div>
+          <p class="text-xs text-center text-slate-500 mt-2">
+            Phase 3 training focus by Heart Rate/Power Zone.
+          </p>
         </div>
+        <div id="phase3-nav" class="flex flex-wrap gap-2 mb-4"></div>
+        <div id="phase3-content"></div>
+      </div>
 
-        <div id="page-library" class="page-content hidden space-y-6">
-            <div class="bg-white rounded-lg shadow p-4 md:p-6">
-                <h2 class="text-xl sm:text-2xl font-semibold text-slate-800 mb-4">Workout Library</h2>
-                <p class="text-slate-600 mb-6">
-                    This library contains all the reference tables and protocols from your training plan PDF.
-                </p>
+      <div id="page-library" class="page-content hidden space-y-6">
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Protocol 1: Establishing LTHR (Outdoor Test)</summary>
+          <div>
+            <p class="text-sm text-slate-600 mb-4">
+              This 30-minute cycling-specific field test must be performed
+              outdoors on your mountain bike to set your 7-Zone Heart Rate
+              Model.
+            </p>
+            <ol
+              class="list-decimal list-inside space-y-2 text-sm text-slate-700"
+            >
+              <li>
+                <strong>Warm-up:</strong> Complete 15-20 minutes of easy
+                spinning.
+              </li>
+              <li>
+                <strong>Main Set:</strong> Begin a 30-minute sustained time
+                trial (fastest consistent pace possible).
+              </li>
+              <li>
+                <strong>Data Capture:</strong> Exactly 10 minutes into the
+                30-minute effort, press the "Lap" button on your Garmin.
+              </li>
+              <li>
+                <strong>Finish:</strong> Complete the 30-minute time trial.
+              </li>
+              <li>
+                <strong>Cool-down:</strong> Perform 10-15 minutes of very easy
+                (Z1) spinning.
+              </li>
+              <li>
+                <strong>Analyze:</strong> Your LTHR is the
+                <b>average heart rate for the final 20-minute lap</b> of the
+                test.
+              </li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Protocol 2: Establishing FTP (Peloton Test)</summary>
+          <div>
+            <p class="text-sm text-slate-600 mb-4">
+              This test must be performed on the Peloton to calibrate your
+              7-Zone Power Model.
+            </p>
+            <ol
+              class="list-decimal list-inside space-y-2 text-sm text-slate-700"
+            >
+              <li>
+                <strong>Preparation:</strong> Locate the FTP Test on the Peloton
+                platform.
+              </li>
+              <li><strong>Test:</strong> Complete the 20-minute FTP test.</li>
+              <li>
+                <strong>Analysis:</strong> The Peloton system will automatically
+                calculate your FTP (typically 95% of the 20-min average power).
+              </li>
+              <li>
+                <strong>Peloton Setup:</strong> Enter this new FTP number into
+                your Peloton user profile settings to calibrate your zones.
+              </li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Outdoor 7-Zone Heart Rate Model (Table 1)</summary>
+          <div>
+            <p class="text-sm text-slate-600 mb-4">
+              Based on % of Lactate Threshold Heart Rate (LTHR)
+            </p>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th>Name</th>
+                  <th>% of LTHR</th>
+                  <th>RPE</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Z1</td>
+                  <td>Active Recovery</td>
+                  <td>&lt;68%</td>
+                  <td>&lt;2/10</td>
+                  <td>Promotes recovery</td>
+                </tr>
+                <tr>
+                  <td>Z2</td>
+                  <td>Endurance</td>
+                  <td>69-83%</td>
+                  <td>2-3/10</td>
+                  <td>Builds aerobic base, "all-day" pace</td>
+                </tr>
+                <tr>
+                  <td>Z3</td>
+                  <td>Tempo</td>
+                  <td>84-94%</td>
+                  <td>3-4/10</td>
+                  <td>"Comfortably hard," improves muscular endurance</td>
+                </tr>
+                <tr>
+                  <td>Z4</td>
+                  <td>Lactate Threshold</td>
+                  <td>95-105%</td>
+                  <td>4-5/10</td>
+                  <td>Increases sustained high-intensity capacity</td>
+                </tr>
+                <tr>
+                  <td>Z5</td>
+                  <td>VO2 Max</td>
+                  <td>&gt;106%</td>
+                  <td>6-7/10</td>
+                  <td>Boosts maximum aerobic power</td>
+                </tr>
+                <tr>
+                  <td>Z6</td>
+                  <td>Anaerobic Capacity</td>
+                  <td>N/A (HR lag)</td>
+                  <td>&gt;7/10</td>
+                  <td>Short, maximal efforts</td>
+                </tr>
+                <tr>
+                  <td>Z7</td>
+                  <td>Neuromuscular</td>
+                  <td>N/A (HR lag)</td>
+                  <td>Maximal</td>
+                  <td>Sprints</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Indoor 7-Zone Power Model (Table 2)</summary>
+          <div>
+            <p class="text-sm text-slate-600 mb-4">
+              Based on % of Functional Threshold Power (FTP)
+            </p>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th>Name</th>
+                  <th>% of FTP</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Z1</td>
+                  <td>Active Recovery</td>
+                  <td>&lt;55%</td>
+                  <td>Active recovery</td>
+                </tr>
+                <tr>
+                  <td>Z2</td>
+                  <td>Endurance</td>
+                  <td>56-75%</td>
+                  <td>Aerobic base building</td>
+                </tr>
+                <tr>
+                  <td>Z3</td>
+                  <td>Tempo</td>
+                  <td>76-90%</td>
+                  <td>Muscular endurance</td>
+                </tr>
+                <tr>
+                  <td>Z4</td>
+                  <td>Lactate Threshold</td>
+                  <td>91-105%</td>
+                  <td>Raises FTP</td>
+                </tr>
+                <tr>
+                  <td>Z5</td>
+                  <td>VO2 Max</td>
+                  <td>106-120%</td>
+                  <td>Max aerobic capacity</td>
+                </tr>
+                <tr>
+                  <td>Z6</td>
+                  <td>Anaerobic Capacity</td>
+                  <td>121-150%</td>
+                  <td>Anaerobic capacity</td>
+                </tr>
+                <tr>
+                  <td>Z7</td>
+                  <td>Neuromuscular</td>
+                  <td>&gt;150%</td>
+                  <td>Max power</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Peloton Class Glossary (Sec 1.4)</summary>
+          <div class="space-y-4">
+            <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
+              <li>
+                <strong>Power Zone Endurance (PZE):</strong> Primary tool for
+                all Z2 and Z3 workouts to build the aerobic base.
+              </li>
+              <li>
+                <strong>Power Zone / Power Zone Max:</strong> Used for
+                structured Z4 (Threshold) and Z5 (VO2 Max) intervals.
+              </li>
+              <li>
+                <strong>Climb Rides:</strong> Essential for building muscular
+                endurance and sustained, high-torque (high resistance, lower
+                cadence) efforts.
+              </li>
+              <li>
+                <strong>HIIT / Tabata Rides:</strong> Used for unstructured
+                Z5/Z6 intervals and to sharpen top-end fitness.
+              </li>
+              <li>
+                <strong>Low Impact / Recovery Rides:</strong> Used for Z1 active
+                recovery sessions.
+              </li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Strength Phase 1: Adaptation (Table 3)</summary>
+          <div>
+            <div class="text-sm text-slate-600 mb-4 space-y-1">
+              <p>
+                <strong class="text-slate-700">Goal:</strong> Prepare muscles,
+                tendons, and ligaments for the stress of heavier training.
+                Aligns with the Winter Build (Weeks 1-6).
+              </p>
+              <p>
+                <strong class="text-slate-700">Protocol:</strong> 3 sets of
+                15-20 repetitions.
+              </p>
+              <p>
+                <strong class="text-slate-700">Load:</strong> Light (40-60% of
+                1-Rep Max, or 1RM).
+              </p>
+              <p>
+                <strong class="text-slate-700">Rest:</strong> 1-2 minutes
+                between sets.
+              </p>
             </div>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Sets</th>
+                  <th>Reps</th>
+                  <th>Weight</th>
+                  <th>Focus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Goblet Squat</td>
+                  <td>3</td>
+                  <td>15-20</td>
+                  <td>Light</td>
+                  <td>Form, muscle prep</td>
+                </tr>
+                <tr>
+                  <td>Push-up (or Incline)</td>
+                  <td>3</td>
+                  <td>15-20</td>
+                  <td>Bodyweight</td>
+                  <td>Upper body endurance</td>
+                </tr>
+                <tr>
+                  <td>Dumbbell Row</td>
+                  <td>3</td>
+                  <td>15-20</td>
+                  <td>Light</td>
+                  <td>Postural strength</td>
+                </tr>
+                <tr>
+                  <td>Lunge</td>
+                  <td>3</td>
+                  <td>15-20</td>
+                  <td>Light</td>
+                  <td>Unilateral stability</td>
+                </tr>
+                <tr>
+                  <td>Overhead Press</td>
+                  <td>3</td>
+                  <td>15-20</td>
+                  <td>Light</td>
+                  <td>Shoulder stability</td>
+                </tr>
+                <tr>
+                  <td>Plank</td>
+                  <td>3</td>
+                  <td>60s hold</td>
+                  <td>Bodyweight</td>
+                  <td>Core stabilization</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
-            <!-- NEW: Testing Protocols -->
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Protocol 1: Establishing LTHR (Outdoor Test)</summary>
-                <div>
-                    <p class="text-sm text-slate-600 mb-4">This 30-minute cycling-specific field test must be performed
-                        outdoors on your mountain bike to set your 7-Zone Heart Rate Model.</p>
-                    <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700">
-                        <li><strong>Warm-up:</strong> Complete 15-20 minutes of easy spinning.</li>
-                        <li><strong>Main Set:</strong> Begin a 30-minute sustained time trial (fastest consistent pace
-                            possible).</li>
-                        <li><strong>Data Capture:</strong> Exactly 10 minutes into the 30-minute effort, press the "Lap"
-                            button on your Garmin.</li>
-                        <li><strong>Finish:</strong> Complete the 30-minute time trial.</li>
-                        <li><strong>Cool-down:</strong> Perform 10-15 minutes of very easy (Z1) spinning.</li>
-                        <li><strong>Analyze:</strong> Your LTHR is the **average heart rate for the final 20-minute
-                            lap** of the test.</li>
-                    </ol>
-                </div>
-            </details>
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Strength Phase 2: Maximum Strength (Table 4)</summary>
+          <div>
+            <div class="text-sm text-slate-600 mb-4 space-y-1">
+              <p>
+                <strong class="text-slate-700">Goal:</strong> Improve maximum
+                force production by enhancing neuromuscular recruitment. Aligns
+                with Base 1 and Base 2 blocks (Weeks 11-18).
+              </p>
+              <p>
+                <strong class="text-slate-700">Protocol:</strong> 3-5 sets of
+                3-6 repetitions. This low-rep, high-weight protocol builds
+                neurological strength without adding significant muscle mass,
+                improving the strength-to-weight ratio.
+              </p>
+              <p>
+                <strong class="text-slate-700">Load:</strong> Heavy (80-95%
+                1RM).
+              </p>
+              <p>
+                <strong class="text-slate-700">Rest:</strong> 2-4 minutes
+                between sets.
+              </p>
+            </div>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Sets</th>
+                  <th>Reps</th>
+                  <th>Weight</th>
+                  <th>Focus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Barbell Squat or Leg Press</td>
+                  <td>4</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Max leg force</td>
+                </tr>
+                <tr>
+                  <td>Deadlift (or Trap Bar)</td>
+                  <td>4</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Full-body power, posterior chain</td>
+                </tr>
+                <tr>
+                  <td>Bench Press (or DB Press)</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Upper body strength</td>
+                </tr>
+                <tr>
+                  <td>Pull-up or Lat Pulldown</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Pulling strength for bike control</td>
+                </tr>
+                <tr>
+                  <td>Bulgarian Split Squat</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Unilateral strength, glute activation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Protocol 2: Establishing FTP (Peloton Test)</summary>
-                <div>
-                    <p class="text-sm text-slate-600 mb-4">This test must be performed on the Peloton to calibrate your
-                        7-Zone Power Model.</p>
-                    <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700">
-                        <li><strong>Preparation:</strong> Locate the FTP Test on the Peloton platform (e.g., 15-min FTP
-                            warm-up + 20-min test).</li>
-                        <li><strong>Test:</strong> Complete the 20-minute FTP test.</li>
-                        <li><strong>Analysis:</strong> The Peloton system will automatically calculate your FTP
-                            (typically 95% of the 20-min average power).</li>
-                        <li><strong>Peloton Setup:</strong> Enter this new FTP number into your Peloton user profile
-                            settings to calibrate your zones.</li>
-                    </ol>
-                </div>
-            </details>
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>
+            Strength Phase 3: Strength Maintenance (Heavy) (Table 5)
+          </summary>
+          <div>
+            <div class="text-sm text-slate-600 mb-4 space-y-1">
+              <p>
+                <strong class="text-slate-700">Goal:</strong> Maintain the
+                maximal strength and neuromuscular efficiency gained in Phase 2.
+                Critical for improving cycling economy and delaying fatigue.
+                Aligns with Build 1 and Build 2 blocks (Weeks 19-26).
+              </p>
+              <p>
+                <strong class="text-slate-700">Protocol:</strong> 2 sessions per
+                week. 3 sets of 3-6 repetitions.
+              </p>
+              <p>
+                <strong class="text-slate-700">Load:</strong> Heavy (80-95%
+                1RM).
+              </p>
+              <p>
+                <strong class="text-slate-700">Rest:</strong> 2-4 minutes
+                between sets.
+              </p>
+              <p class="mt-2">
+                <b>Rationale:</b> Evidence supports maintaining
+                <b>intensity</b> (heavy weight) while reducing
+                <b>volume</b> during the build phase. High-rep "endurance"
+                lifting is less effective as it merely replicates the metabolic
+                stress of cycling.
+              </p>
+            </div>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Sets</th>
+                  <th>Reps</th>
+                  <th>Weight</th>
+                  <th>Focus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Barbell Squat or Leg Press</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Max leg force</td>
+                </tr>
+                <tr>
+                  <td>Deadlift (or Trap Bar)</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Full-body power, posterior chain</td>
+                </tr>
+                <tr>
+                  <td>Bench Press (or DB Press)</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Upper body strength</td>
+                </tr>
+                <tr>
+                  <td>Pull-up or Lat Pulldown</td>
+                  <td>3</td>
+                  <td>3-6</td>
+                  <td>Heavy</td>
+                  <td>Pulling strength for bike control</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Outdoor 7-Zone Heart Rate Model (Table 1)</summary>
-                <div>
-                    <p class="text-sm text-slate-600 mb-4">Based on % of Lactate Threshold Heart Rate (LTHR)</p>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Zone</th>
-                                <th>Name</th>
-                                <th>% of LTHR</th>
-                                <th>RPE</th>
-                                <th>Purpose</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Z1</td>
-                                <td>Active Recovery</td>
-                                <td>&lt;68%</td>
-                                <td>&lt;2/10</td>
-                                <td>Promotes recovery</td>
-                            </tr>
-                            <tr>
-                                <td>Z2</td>
-                                <td>Endurance</td>
-                                <td>69-83%</td>
-                                <td>2-3/10</td>
-                                <td>Builds aerobic base, "all-day" pace</td>
-                            </tr>
-                            <tr>
-                                <td>Z3</td>
-                                <td>Tempo</td>
-                                <td>84-94%</td>
-                                <td>3-4/10</td>
-                                <td>"Comfortably hard," improves muscular endurance</td>
-                            </tr>
-                            <tr>
-                                <td>Z4</td>
-                                <td>Lactate Threshold</td>
-                                <td>95-105%</td>
-                                <td>4-5/10</td>
-                                <td>Increases sustained high-intensity capacity</td>
-                            </tr>
-                            <tr>
-                                <td>Z5</td>
-                                <td>VO2 Max</td>
-                                <td>&gt;106%</td>
-                                <td>6-7/10</td>
-                                <td>Boosts maximum aerobic power</td>
-                            </tr>
-                            <tr>
-                                <td>Z6</td>
-                                <td>Anaerobic Capacity</td>
-                                <td>N/A (HR lag)</td>
-                                <td>&gt;7/10</td>
-                                <td>Short, maximal efforts</td>
-                            </tr>
-                            <tr>
-                                <td>Z7</td>
-                                <td>Neuromuscular</td>
-                                <td>N/A (HR lag)</td>
-                                <td>Maximal</td>
-                                <td>Sprints</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>
+            Strength Phase 4: In-Season Taper/Race Maintenance (Table 6)
+          </summary>
+          <div>
+            <div class="text-sm text-slate-600 mb-4 space-y-1">
+              <p>
+                <strong class="text-slate-700">Goal:</strong> Retain
+                neuromuscular activation ("openers") with minimal fatigue during
+                the taper and race week (Weeks 27-30).
+              </p>
+              <p>
+                <strong class="text-slate-700">Protocol:</strong> 1 session per
+                week. 2 sets of 3-5 repetitions.
+              </p>
+              <p>
+                <strong class="text-slate-700">Load:</strong> Heavy, but not to
+                failure (e.g., ~80% 1RM).
+              </p>
+              <p class="mt-2">
+                <b>Rationale:</b> This follows the "minimum effective dose"
+                strategy. The goal is to keep the nervous system primed while
+                allowing full recovery.
+              </p>
+            </div>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Sets</th>
+                  <th>Reps</th>
+                  <th>Weight</th>
+                  <th>Focus</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Goblet Squat (or Barbell Squat)</td>
+                  <td>2</td>
+                  <td>3-5</td>
+                  <td>Heavy</td>
+                  <td>Activation</td>
+                </tr>
+                <tr>
+                  <td>Push-up (or Bench Press)</td>
+                  <td>2</td>
+                  <td>3-5</td>
+                  <td>Heavy</td>
+                  <td>Activation</td>
+                </tr>
+                <tr>
+                  <td>Dumbbell Row</td>
+                  <td>2</td>
+                  <td>3-5</td>
+                  <td>Heavy</td>
+                  <td>Activation</td>
+                </tr>
+                <tr>
+                  <td>Plank</td>
+                  <td>2</td>
+                  <td>60s hold</td>
+                  <td>Bodyweight</td>
+                  <td>Activation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
 
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Indoor 7-Zone Power Model (Table 2)</summary>
-                <div>
-                    <p class="text-sm text-slate-600 mb-4">Based on % of Functional Threshold Power (FTP)</p>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Zone</th>
-                                <th>Name</th>
-                                <th>% of FTP</th>
-                                <th>Purpose</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Z1</td>
-                                <td>Active Recovery</td>
-                                <td>&lt;55%</td>
-                                <td>Active recovery</td>
-                            </tr>
-                            <tr>
-                                <td>Z2</td>
-                                <td>Endurance</td>
-                                <td>56-75%</td>
-                                <td>Aerobic base building</td>
-                            </tr>
-                            <tr>
-                                <td>Z3</td>
-                                <td>Tempo</td>
-                                <td>76-90%</td>
-                                <td>Muscular endurance</td>
-                            </tr>
-                            <tr>
-                                <td>Z4</td>
-                                <td>Lactate Threshold</td>
-                                <td>91-105%</td>
-                                <td>Raises FTP</td>
-                            </tr>
-                            <tr>
-                                <td>Z5</td>
-                                <td>VO2 Max</td>
-                                <td>106-120%</td>
-                                <td>Max aerobic capacity</td>
-                            </tr>
-                            <tr>
-                                <td>Z6</td>
-                                <td>Anaerobic Capacity</td>
-                                <td>121-150%</td>
-                                <td>Anaerobic capacity</td>
-                            </tr>
-                            <tr>
-                                <td>Z7</td>
-                                <td>Neuromuscular</td>
-                                <td>&gt;150%</td>
-                                <td>Max power</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Peloton Class Glossary (Sec 1.4)</summary>
-                <div class="space-y-4">
-                    <ul class="list-disc list-inside space-y-2 text-sm text-slate-700">
-                        <li><strong>Power Zone Endurance (PZE):</strong> This will be the primary tool for all Z2 and Z3
-                            workouts. These classes build the aerobic base and are the workhorse of this plan.</li>
-                        <li><strong>Power Zone / Power Zone Max:</strong> These classes will be used for structured Z4
-                            (Threshold) and Z5 (VO2 Max) intervals.</li>
-                        <li><strong>Climb Rides:</strong> These classes are essential for building muscular endurance
-                            and sustained, high-torque (high resistance, lower cadence) efforts.</li>
-                        <li><strong>HIIT / Tabata Rides:</strong> These classes will be used for unstructured Z5/Z6
-                            intervals and to sharpen top-end fitness.</li>
-                        <li><strong>Low Impact / Recovery Rides:</strong> These will be used for Z1 active recovery
-                            sessions.</li>
-                    </ul>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Strength Phase 1: Adaptation (Table 3)</summary>
-                <div>
-                    <!-- NEW: Strength Context -->
-                    <div class="text-sm text-slate-600 mb-4 space-y-1">
-                        <p><strong class="text-slate-700">Goal:</strong> Prepare muscles, tendons, and ligaments for the
-                            stress of heavier training. Aligns with the Winter Build (Weeks 1-4).</p>
-                        <p><strong class="text-slate-700">Protocol:</strong> 3 sets of 15-20 repetitions.</p>
-                        <p><strong class="text-slate-700">Load:</strong> Light (40-60% of 1-Rep Max, or 1RM).</p>
-                        <p><strong class="text-slate-700">Rest:</strong> 1-2 minutes between sets.</p>
-                    </div>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Weight</th>
-                                <th>Focus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Goblet Squat</td>
-                                <td>3</td>
-                                <td>15-20</td>
-                                <td>Light</td>
-                                <td>Form, muscle prep</td>
-                            </tr>
-                            <tr>
-                                <td>Push-up (or Incline)</td>
-                                <td>3</td>
-                                <td>15-20</td>
-                                <td>Bodyweight</td>
-                                <td>Upper body endurance</td>
-                            </tr>
-                            <tr>
-                                <td>Dumbbell Row</td>
-                                <td>3</td>
-                                <td>15-20</td>
-                                <td>Light</td>
-                                <td>Postural strength</td>
-                            </tr>
-                            <tr>
-                                <td>Lunge</td>
-                                <td>3</td>
-                                <td>15-20</td>
-                                <td>Light</td>
-                                <td>Unilateral stability</td>
-                            </tr>
-                            <tr>
-                                <td>Overhead Press</td>
-                                <td>3</td>
-                                <td>15-20</td>
-                                <td>Light</td>
-                                <td>Shoulder stability</td>
-                            </tr>
-                            <tr>
-                                <td>Plank</td>
-                                <td>3</td>
-                                <td>60s hold</td>
-                                <td>Bodyweight</td>
-                                <td>Core stabilization</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Strength Phase 2: Maximum Strength (Table 4)</summary>
-                <div>
-                    <!-- NEW: Strength Context -->
-                    <div class="text-sm text-slate-600 mb-4 space-y-1">
-                        <p><strong class="text-slate-700">Goal:</strong> Improve maximum force production by enhancing
-                            neuromuscular recruitment. Aligns with Base 1 and Base 2 blocks (Weeks 9-16).</p>
-                        <p><strong class="text-slate-700">Protocol:</strong> 3-5 sets of 3-6 repetitions. This low-rep,
-                            high-weight protocol builds neurological strength without adding significant muscle mass,
-                            improving the strength-to-weight ratio.</p>
-                        <p><strong class="text-slate-700">Load:</strong> Heavy (80-95% 1RM).</p>
-                        <p><strong class="text-slate-700">Rest:</strong> 2-4 minutes between sets.</p>
-                    </div>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Weight</th>
-                                <th>Focus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Barbell Squat or Leg Press</td>
-                                <td>4</td>
-                                <td>3-6</td>
-                                <td>Heavy</td>
-                                <td>Max leg force</td>
-                            </tr>
-                            <tr>
-                                <td>Deadlift (or Trap Bar)</td>
-                                <td>4</td>
-                                <td>3-6</td>
-                                <td>Heavy</td>
-                                <td>Full-body power, posterior chain</td>
-                            </tr>
-                            <tr>
-                                <td>Bench Press (or DB Press)</td>
-                                <td>3</td>
-                                <td>3-6</td>
-                                <td>Heavy</td>
-                                <td>Upper body strength</td>
-                            </tr>
-                            <tr>
-                                <td>Pull-up or Lat Pulldown</td>
-                                <td>3</td>
-                                <td>3-6</td>
-                                <td>Heavy</td>
-                                <td>Pulling strength for bike control</td>
-                            </tr>
-                            <tr>
-                                <td>Bulgarian Split Squat</td>
-                                <td>3</td>
-                                <td>3-6</td>
-                                <td>Heavy</td>
-                                <td>Unilateral strength, glute activation</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Strength Phase 3: Muscular Endurance (Table 5)</summary>
-                <div>
-                    <!-- NEW: Strength Context -->
-                    <div class="text-sm text-slate-600 mb-4 space-y-1">
-                        <p><strong class="text-slate-700">Goal:</strong> Convert the raw strength from Phase 2 into
-                            sport-specific, fatigue-resistant power. Aligns with Build 1 and Build 2 blocks (Weeks
-                            17-24).</p>
-                        <p><strong class="text-slate-700">Protocol:</strong> 2-3 sets of 15-20 repetitions. The focus is
-                            on more dynamic, high-repetition movements.</p>
-                        <p><strong class="text-slate-700">Load:</strong> Medium.</p>
-                        <p><strong class="text-slate-700">Rest:</strong> 1-2 minutes between sets.</p>
-                    </div>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Weight</th>
-                                <th>Focus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Kettlebell Swing</td>
-                                <td>3</td>
-                                <td>20</td>
-                                <td>Medium</td>
-                                <td>Explosive hip extension, power</td>
-                            </tr>
-                            <tr>
-                                <td>Single-Leg Deadlift</td>
-                                <td>3</td>
-                                <td>15</td>
-                                <td>Medium</td>
-                                <td>Unilateral stability, endurance</td>
-                            </tr>
-                            <tr>
-                                <td>Dumbbell Row</td>
-                                <td>3</td>
-                                <td>15</td>
-                                <td>Medium</td>
-                                <td>Postural endurance</td>
-                            </tr>
-                            <tr>
-                                <td>Box Jump (or Squat Jump)</td>
-                                <td>3</td>
-                                <td>10</td>
-                                <td>Bodyweight</td>
-                                <td>Neuromuscular power</td>
-                            </tr>
-                            <tr>
-                                <td>Russian Twist</td>
-                                <td>3</td>
-                                <td>20 (each)</td>
-                                <td>Medium</td>
-                                <td>Rotational core strength</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Strength Phase 4: In-Season Maintenance (Table 6)</summary>
-                <div>
-                    <!-- NEW: Strength Context -->
-                    <div class="text-sm text-slate-600 mb-4 space-y-1">
-                        <p><strong class="text-slate-700">Goal:</strong> Maintain strength and activation with minimal
-                            volume and fatigue during the taper and race week (Weeks 25-28).</p>
-                        <p><strong class="text-slate-700">Protocol:</strong> 1-2 sessions per week. 2 sets of 8-10
-                            repetitions.</p>
-                        <p><strong class="text-slate-700">Load:</strong> Medium.</p>
-                    </div>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>Sets</th>
-                                <th>Reps</th>
-                                <th>Weight</th>
-                                <th>Focus</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Goblet Squat</td>
-                                <td>2</td>
-                                <td>10</td>
-                                <td>Medium</td>
-                                <td>Activation</td>
-                            </tr>
-                            <tr>
-                                <td>Push-up</td>
-                                <td>2</td>
-                                <td>10-15</td>
-                                <td>Bodyweight</td>
-                                <td>Activation</td>
-                            </tr>
-                            <tr>
-                                <td>Dumbbell Row</td>
-                                <td>2</td>
-                                <td>10</td>
-                                <td>Medium</td>
-                                <td>Activation</td>
-                            </tr>
-                            <tr>
-                                <td>Plank</td>
-                                <td>2</td>
-                                <td>60s hold</td>
-                                <td>Bodyweight</td>
-                                <td>Activation</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-
-            <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
-                <summary>Core-Specific Routine (Table 7)</summary>
-                <div>
-                    <!-- NEW: Strength Context -->
-                    <div class="text-sm text-slate-600 mb-4 space-y-1">
-                        <p>A strong core is the "connection point" that transfers power from the legs to the pedals and
-                            allows the upper body to control the bike. This 10-minute routine should be performed 2-3
-                            times per week, ideally after easier Z2 rides.</p>
-                    </div>
-                    <table class="library-table">
-                        <thead>
-                            <tr>
-                                <th>Exercise</th>
-                                <th>Reps / Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Plank</td>
-                                <td>60s hold</td>
-                            </tr>
-                            <tr>
-                                <td>Side Plank (L/R)</td>
-                                <td>30s hold each side</td>
-                            </tr>
-                            <tr>
-                                <td>Bird-Dog</td>
-                                <td>10 each side (slow, controlled)</td>
-                            </tr>
-                            <tr>
-                                <td>Bicycle Crunches</td>
-                                <td>20 each side</td>
-                            </tr>
-                            <tr>
-                                <td>Glute Bridge</td>
-                                <td>60s hold or 15 reps</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-        </div>
+        <details class="bg-stone-100 p-4 rounded-lg shadow-sm">
+          <summary>Core-Specific Routine (Table 7)</summary>
+          <div>
+            <div class="text-sm text-slate-600 mb-4 space-y-1">
+              <p>
+                A strong core is the "connection point" that transfers power
+                from the legs to the pedals and allows the upper body to control
+                the bike. This 10-minute routine should be performed 2-3 times
+                per week, ideally after easier Z2 rides.
+              </p>
+            </div>
+            <table class="library-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Reps / Duration</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Plank</td>
+                  <td>60s hold</td>
+                </tr>
+                <tr>
+                  <td>Side Plank (L/R)</td>
+                  <td>30s hold each side</td>
+                </tr>
+                <tr>
+                  <td>Bird-Dog</td>
+                  <td>10 each side (slow, controlled)</td>
+                </tr>
+                <tr>
+                  <td>Bicycle Crunches</td>
+                  <td>20 each side</td>
+                </tr>
+                <tr>
+                  <td>Glute Bridge</td>
+                  <td>60s hold or 15 reps</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener("DOMContentLoaded", () => {
+        // This data is now 100% from the PDF's tables, adjusted for the full 30 weeks.
+        const trainingLoadData = {
+          labels: [
+            "W1",
+            "W2",
+            "W3",
+            "W4",
+            "W5",
+            "W6",
+            "W7",
+            "W8",
+            "W9",
+            "W10",
+            "W11",
+            "W12",
+            "W13",
+            "W14",
+            "W15",
+            "W16",
+            "W17",
+            "W18",
+            "W19",
+            "W20",
+            "W21",
+            "W22",
+            "W23",
+            "W24",
+            "W25",
+            "W26",
+            "W27",
+            "W28",
+            "W29",
+            "W30",
+          ],
+          data: [
+            6.15, // Wk 1 (Table 8.1)
+            7.45, // Wk 2 (Table 8.2)
+            8.3, // Wk 3 (Table 8.3)
+            4.15, // Wk 4 (Table 8.4)
+            6.45, // Wk 5 (Table 8.5)
+            7.3, // Wk 6 (Table 8.6)
+            2.0, // Wk 7 (Table 8.7) - Race time is variable, using ~2h scheduled time.
+            4.0, // Wk 8 (Table 8.8)
+            4.15, // Wk 9 (Table 8.9) - Race time is variable, using ~4:15h scheduled time.
+            1.45, // Wk 10 (Table 8.10)
+            7.15, // Wk 11 (Table 8.11)
+            8.3, // Wk 12 (Table 8.12)
+            9.15, // Wk 13 (Table 8.13)
+            10.0, // Wk 14 (Table 8.14)
+            10.3, // Wk 15 (Table 8.15)
+            11.45, // Wk 16 (Table 8.16)
+            12.15, // Wk 17 (Table 8.17)
+            5.3, // Wk 18 (Table 8.18)
+            11.0, // Wk 19 (Table 8.19)
+            11.0, // Wk 20 (Table 8.20)
+            11.3, // Wk 21 (Table 8.21)
+            5.15, // Wk 22 (Table 8.22)
+            11.45, // Wk 23 (Table 8.23) - Using scheduled time only (excluding optional).
+            13.0, // Wk 24 (Table 8.24) - Using scheduled time only (excluding optional).
+            13.45, // Wk 25 (Table 8.25) - Using scheduled time only (excluding optional).
+            5.15, // Wk 26 (Table 8.26)
+            7.45, // Wk 27 (Table 8.27)
+            4.15, // Wk 28 (Table 8.28)
+            1.15, // Wk 29 (Table 8.29) - Race days are excluded from the total volume calculation.
+            0, // Wk 30 (Table 8.30) - Race Days Only
+          ],
+        };
 
-            // This data is now 100% from the PDF's tables
-            const trainingLoadData = {
-                labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8', 'W9', 'W10', 'W11', 'W12', 'W13', 'W14', 'W15', 'W16', 'W17', 'W18', 'W19', 'W20', 'W21', 'W22', 'W23', 'W24', 'W25', 'W26', 'W27', 'W28'],
-                data: [
-                    6.75,  // Wk 1 (Table 8.1)
-                    7,     // Wk 2 (Table 8.2)
-                    8.5,   // Wk 3 (Table 8.3)
-                    4.25,  // Wk 4 (Table 8.4)
-                    6.25,  // Wk 5 (Table 8.5) - ~4h race + sessions
-                    4,     // Wk 6 (Table 8.6)
-                    3.25,  // Wk 7 (Table 8.7) - ~3.25h + Race
-                    1.75,  // Wk 8 (Table 8.8)
-                    7.25,  // Wk 9 (Table 8.9)
-                    8.5,   // Wk 10 (Table 8.10)
-                    9.25,  // Wk 11 (Table 8.11)
-                    10,    // Wk 12 (Table 8.12)
-                    10.5,  // Wk 13 (Table 8.13)
-                    11.75, // Wk 14 (Table 8.14)
-                    1.25, // Wk 15 (Table 8.15)
-                    5.5,   // Wk 16 (Table 8.16)
-                    11,    // Wk 17 (Table 8.17)
-                    11,    // Wk 18 (Table 8.18)
-                    11.5,  // Wk 19 (Table 8.19)
-                    5.25,  // Wk 20 (Table 8.20)
-                    11.75, // Wk 21 (Table 8.21)
-                    13,    // Wk 22 (Table 8.22)
-                    13.75, // Wk 23 (Table 8.23)
-                    5.25,  // Wk 24 (Table 8.24)
-                    7.75,  // Wk 25 (Table 8.25)
-                    4.25,  // Wk 26 (Table 8.26)
-                    1.5,   // Wk 27 (Table 8.27) - ~1.5h + Race Days
-                    0      // Wk 28 (Table 8.28) - Race Days Only
-                ]
-            };
+        // These charts are now based on the goals from the PDF
+        const phaseIntensityData = {
+          phase1: {
+            data: [10, 35, 30, 20, 5],
+            label: "Phase 1: Winter Campaign (Z3/Z4 Focus)",
+          },
+          phase2: {
+            data: [15, 65, 15, 5, 0],
+            label: "Phase 2: BCBR Base (Z2 Focus)",
+          },
+          phase3: {
+            data: [10, 30, 25, 25, 10],
+            label: "Phase 3: BCBR Build (Z4/Z5 Focus)",
+          },
+        };
 
-            // These charts are now based on the goals from the PDF
-            const phaseIntensityData = {
-                phase1: { data: [10, 35, 30, 20, 5], label: 'Phase 1: Winter Campaign (Z3/Z4 Focus)' },
-                phase2: { data: [15, 65, 15, 5, 0], label: 'Phase 2: BCBR Base (Z2 Focus)' },
-                phase3: { data: [10, 40, 20, 20, 10], label: 'Phase 3: BCBR Build (Z4/Z5 Focus)' },
-            };
+        // This planData is now a direct copy of Tables 8.1 - 8.30
+        const planData = {
+          phase1: {
+            "Wk 1 (Nov 3-9)": [
+              { day: "Mon (Nov 3)", type: "Rest", details: "Full rest day." },
+              { day: "Tue (Nov 4)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Nov 5)",
+                type: "Strength",
+                details: "0:45 - Phase 1 Workout (Table 3)",
+              },
+              {
+                day: "Thu (Nov 6)",
+                type: "Peloton",
+                details:
+                  '1:00 - 45-min "Climb" ride (Z3/Z4). Focus on sustained high resistance. +15min WU/CD.',
+              },
+              {
+                day: "Fri (Nov 7)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Nov 8)",
+                type: "Strength",
+                details: "1:00 - Phase 1 Workout (Table 3) + Core (Table 7)",
+              },
+              {
+                day: "Sun (Nov 9)",
+                type: "MTB",
+                details:
+                  "2:30 - 2000ft elevation. Steady Z2 pace, push Z3 on all significant climbs.",
+              },
+            ],
+            "Wk 2 (Nov 10-16)": [
+              {
+                day: "Mon (Nov 10)",
+                type: "X-Train",
+                details: "0:30 - Easy aerobic run (Z2), steady pace.",
+              },
+              { day: "Tue (Nov 11)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Nov 12)",
+                type: "Strength",
+                details: "0:45 - Phase 1 Workout (Table 3)",
+              },
+              {
+                day: "Thu (Nov 13)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride. Main set: 3x8 min @ Z4. +15min WU/CD.',
+              },
+              {
+                day: "Fri (Nov 14)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Nov 15)",
+                type: "Strength",
+                details: "1:00 - Phase 1 Workout (Table 3) + Core (Table 7)",
+              },
+              {
+                day: "Sun (Nov 16)",
+                type: "MTB",
+                details:
+                  "3:00 - 2500ft+ elevation. Long steady endurance, Z3 on climbs.",
+              },
+            ],
+            "Wk 3 (Nov 17-23)": [
+              {
+                day: "Mon (Nov 17)",
+                type: "X-Train",
+                details: "0:45 - Steady aerobic run (Z2).",
+              },
+              { day: "Tue (Nov 18)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Nov 19)",
+                type: "Strength",
+                details: "0:45 - Phase 1 Workout (Table 3)",
+              },
+              {
+                day: "Thu (Nov 20)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Climb" ride. Focus sustained Z3/Z4. +15min WU/CD.',
+              },
+              {
+                day: "Fri (Nov 21)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Nov 22)",
+                type: "Strength",
+                details: "1:00 - Phase 1 Workout (Table 3) + Core (Table 7)",
+              },
+              {
+                day: "Sun (Nov 23)",
+                type: "MTB",
+                details:
+                  "3:30 - 3000ft+ elev. Final long build. Test race nutrition.",
+              },
+            ],
+            "Wk 4 (Nov 24-30)": [
+              {
+                day: "Mon (Nov 24)",
+                type: "Peloton",
+                details:
+                  '0:45 - 45-min "Low Impact" ride (Z1/Z2). Active recovery.',
+              },
+              { day: "Tue (Nov 25)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Nov 26)",
+                type: "Peloton",
+                details:
+                  '0:45 - 45-min "Power Zone Endurance" ride (Z2). Easy spin.',
+              },
+              {
+                day: "Thu (Nov 27)",
+                type: "Strength",
+                details: "0:30 - Phase 1 (Table 3). 1-2 sets only. Light.",
+              },
+              {
+                day: "Fri (Nov 28)",
+                type: "Peloton",
+                details:
+                  '0:45 - 45-min "Recovery" ride (Z1/Z2). High cadence, low resistance.',
+              },
+              { day: "Sat (Nov 29)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Sun (Nov 30)",
+                type: "MTB",
+                details: "1:30 - Easy spin on trails (Z2). Focus on flow.",
+              },
+            ],
+            "Wk 5 (Dec 1-7)": [
+              {
+                day: "Mon (Dec 1)",
+                type: "Peloton",
+                details: '0:45 - 30-min PZE ride + 3 x 1 min @ Z4 "Openers".',
+              },
+              { day: "Tue (Dec 2)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Dec 3)",
+                type: "Strength",
+                details: "0:45 - Phase 1 Workout (Table 3)",
+              },
+              {
+                day: "Thu (Dec 4)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride (Z4). Focus on sustained Threshold. +15min WU/CD.',
+              },
+              {
+                day: "Fri (Dec 5)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Dec 6)",
+                type: "Strength",
+                details: "1:00 - Phase 1 Workout (Table 3) + Core (Table 7)",
+              },
+              {
+                day: "Sun (Dec 7)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Steady Z2, push Z3 on climbs.",
+              },
+            ],
+            "Wk 6 (Dec 8-14)": [
+              {
+                day: "Mon (Dec 8)",
+                type: "X-Train",
+                details: "0:45 - Steady aerobic run (Z2).",
+              },
+              { day: "Tue (Dec 9)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Dec 10)",
+                type: "Strength",
+                details: "0:45 - Phase 1 Workout (Table 3)",
+              },
+              {
+                day: "Thu (Dec 11)",
+                type: "Peloton",
+                details:
+                  '1:15 - 45-min "HIIT" ride (Z4/Z5). Focus on Z5 repeatability. +15min WU/CD.',
+              },
+              {
+                day: "Fri (Dec 12)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Dec 13)",
+                type: "Strength",
+                details: "1:00 - Phase 1 Workout (Table 3) + Core (Table 7)",
+              },
+              {
+                day: "Sun (Dec 14)",
+                type: "MTB",
+                details:
+                  "2:30 - 2500ft elev. Long ride; practice race efforts/pacing for 20 minutes.",
+              },
+            ],
+            "Wk 7 (Dec 15-21) - Race 1": [
+              {
+                day: "Mon (Dec 15)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Recovery" ride (Z1).',
+              },
+              { day: "Tue (Dec 16)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Dec 17)",
+                type: "Peloton",
+                details:
+                  '0:45 - 45-min "Power Zone" ride. "Openers": 3x2m @ Z4, 1m @ Z5. Rest Z1.',
+              },
+              {
+                day: "Thu (Dec 18)",
+                type: "Rest",
+                details: "Full rest day. Hydrate, mobility.",
+              },
+              {
+                day: "Fri (Dec 19)",
+                type: "MTB",
+                details:
+                  "0:30 - Easy spin (Z1), 3x30s high cadence spin-ups. Check equipment.",
+              },
+              {
+                day: "Sat (Dec 20)",
+                type: "RACE",
+                details: "~4:00 - RACE DAY: Fat Chuck's Revenge (45 miles)",
+              },
+              {
+                day: "Sun (Dec 21)",
+                type: "Rest",
+                details: "Off. Or 20-min Z1 spin if very sore.",
+              },
+            ],
+            "Wk 8 (Dec 22-28)": [
+              {
+                day: "Mon (Dec 22)",
+                type: "MTB",
+                details:
+                  "1:00 - Very easy recovery ride (Z1/Z2). Focus on blood flow.",
+              },
+              { day: "Tue (Dec 23)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Dec 24)",
+                type: "Peloton",
+                details: '0:30 - 30-min "Recovery" ride (Z1). Easy spin.',
+              },
+              {
+                day: "Thu (Dec 25)",
+                type: "Rest",
+                details: "Optional Z1 spin.",
+              },
+              {
+                day: "Fri (Dec 26)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Sat (Dec 27)",
+                type: "X-Train",
+                details: "0:30 - Easy aerobic run (Z2).",
+              },
+              {
+                day: "Sun (Dec 28)",
+                type: "MTB",
+                details: "1:15 - Easy trail ride (Z2).",
+              },
+            ],
+            "Wk 9 (Dec 29-Jan 4) - Race 2": [
+              {
+                day: "Mon (Dec 29)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Tue (Dec 30)",
+                type: "Peloton",
+                details:
+                  '1:00 - 45-min "Power Zone" ride. 4x5 min @ Z4. +15min WU/CD.',
+              },
+              {
+                day: "Wed (Dec 31)",
+                type: "Double",
+                details:
+                  "1:00 - Relay Sim AM: 30-min Peloton HIIT (Z5). PM: 30-min Run (Z2). (Total 1:00)",
+              },
+              {
+                day: "Thu (Jan 1)",
+                type: "Rest",
+                details: "Full rest day. Hydrate, mobility.",
+              },
+              {
+                day: "Fri (Jan 2)",
+                type: "Peloton",
+                details: '0:30 - 30-min ride with "Openers": 3x1 min @ Z4.',
+              },
+              {
+                day: "Sat (Jan 3)",
+                type: "RACE",
+                details: "Varies - RACE DAY: Excruciate Exam Relay",
+              },
+              {
+                day: "Sun (Jan 4)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Recovery" ride (Z1).',
+              },
+            ],
+          },
+          phase2: {
+            "Wk 10 (Jan 5-11) - Transition": [
+              { day: "Mon (Jan 5)", type: "Rest", details: "Full rest week." },
+              { day: "Tue (Jan 6)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Wed (Jan 7)",
+                type: "Peloton",
+                details: '0:30 - Optional: 30-min "Recovery" ride (Z1).',
+              },
+              { day: "Thu (Jan 8)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Fri (Jan 9)",
+                type: "Peloton",
+                details: '0:30 - Optional: 30-min "Recovery" ride (Z1).',
+              },
+              { day: "Sat (Jan 10)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Sun (Jan 11)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Low Impact" ride (Z1/Z2).',
+              },
+            ],
+            "Wk 11 (Jan 12-18) - Base 1": [
+              { day: "Mon (Jan 12)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Jan 13)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Jan 14)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Jan 15)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Jan 16)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Jan 17)",
+                type: "MTB",
+                details: "1:30 - 1500ft elev. Steady Z2 endurance.",
+              },
+              {
+                day: "Sun (Jan 18)",
+                type: "MTB",
+                details: "1:30 - 1500ft elev. Back-to-back Z2.",
+              },
+            ],
+            "Wk 12 (Jan 19-25) - Base 1": [
+              { day: "Mon (Jan 19)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Jan 20)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Jan 21)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Jan 22)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Jan 23)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Jan 24)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Steady Z2.",
+              },
+              {
+                day: "Sun (Jan 25)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Back-to-back Z2.",
+              },
+            ],
+            "Wk 13 (Jan 26-Feb 1) - Base 1": [
+              { day: "Mon (Jan 26)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Jan 27)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Jan 28)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Jan 29)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Jan 30)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Jan 31)",
+                type: "MTB",
+                details: "2:30 - 2500ft elev. Steady Z2.",
+              },
+              {
+                day: "Sun (Feb 1)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Back-to-back Z2.",
+              },
+            ],
+            "Wk 14 (Feb 2-8) - Base 2": [
+              { day: "Mon (Feb 2)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Feb 3)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Feb 4)",
+                type: "Peloton",
+                details: "1:30 - 90-min PZE ride. Include 3 x 10 min @ Z3.",
+              },
+              {
+                day: "Thu (Feb 5)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Feb 6)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Feb 7)",
+                type: "MTB",
+                details: "3:00 - 3000ft elev. Long steady endurance.",
+              },
+              {
+                day: "Sun (Feb 8)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 endurance.",
+              },
+            ],
+            "Wk 15 (Feb 9-15) - Base 2": [
+              { day: "Mon (Feb 9)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Feb 10)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Feb 11)",
+                type: "Peloton",
+                details:
+                  '1:30 - 75-min "Power Zone" ride. Main set: 3x15 min @ Z3. +15min WU/CD.',
+              },
+              {
+                day: "Thu (Feb 12)",
+                type: "Peloton",
+                details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Feb 13)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Feb 14)",
+                type: "MTB",
+                details: "3:30 - 3500ft elev. Long steady endurance.",
+              },
+              {
+                day: "Sun (Feb 15)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 endurance.",
+              },
+            ],
+            "Wk 16 (Feb 16-22) - Base 2": [
+              { day: "Mon (Feb 16)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Feb 17)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Feb 18)",
+                type: "Peloton",
+                details:
+                  '1:30 - 75-min "Power Zone" ride. Main set: 2x20 min @ Z3. +15min WU/CD.',
+              },
+              {
+                day: "Thu (Feb 19)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Feb 20)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Feb 21)",
+                type: "MTB",
+                details: "4:00 - 4000ft elev. Long steady endurance.",
+              },
+              {
+                day: "Sun (Feb 22)",
+                type: "MTB",
+                details: "2:30 - 2500ft elev. Z2 endurance.",
+              },
+            ],
+            "Wk 17 (Feb 23-Mar 1) - Base 2": [
+              { day: "Mon (Feb 23)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Feb 24)",
+                type: "Strength",
+                details: "1:00 - Phase 2 Workout (Table 4)",
+              },
+              {
+                day: "Wed (Feb 25)",
+                type: "Peloton",
+                details:
+                  '1:30 - 75-min "Climb" ride. Focus sustained Z3. +15min WU/CD.',
+              },
+              {
+                day: "Thu (Feb 26)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Feb 27)",
+                type: "Strength",
+                details: "1:15 - Phase 2 Workout (Table 4) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Feb 28)",
+                type: "MTB",
+                details:
+                  "5:00 - 5000ft elev. Longest Z2 ride. Test nutrition/hydration strategy.",
+              },
+              {
+                day: "Sun (Mar 1)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 endurance.",
+              },
+            ],
+            "Wk 18 (Mar 2-8) - Recovery": [
+              { day: "Mon (Mar 2)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Mar 3)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Recovery" ride (Z1).',
+              },
+              {
+                day: "Wed (Mar 4)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Mar 5)",
+                type: "X-Train",
+                details: "0:30 - Easy run (Z2).",
+              },
+              {
+                day: "Fri (Mar 6)",
+                type: "Strength",
+                details: "0:45 - Phase 2 (Table 4), 1-2 sets only. Light.",
+              },
+              {
+                day: "Sat (Mar 7)",
+                type: "MTB",
+                details: "1:30 - Easy trail ride (Z2).",
+              },
+              {
+                day: "Sun (Mar 8)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+            ],
+          },
+          phase3: {
+            "Wk 19 (Mar 9-15) - Build 1": [
+              { day: "Mon (Mar 9)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Mar 10)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Mar 11)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride. Main set: 4x8 min @ 95-105% FTP (Z4). +15min WU/CD.',
+              },
+              {
+                day: "Thu (Mar 12)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Mar 13)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Mar 14)",
+                type: "MTB",
+                details:
+                  "4:00 - 4000ft elev. Long ride with 3x20 min @ Z3 (Tempo) on climbs.",
+              },
+              {
+                day: "Sun (Mar 15)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 recovery ride.",
+              },
+            ],
+            "Wk 20 (Mar 16-22) - Build 1": [
+              { day: "Mon (Mar 16)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Mar 17)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Mar 18)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride. Main set: 3x10 min @ 95-105% FTP (Z4). +15min WU/CD.',
+              },
+              {
+                day: "Thu (Mar 19)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Mar 20)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Mar 21)",
+                type: "MTB",
+                details:
+                  "4:00 - 4000ft elev. Long ride with 2x30 min @ Z3 (Tempo) on climbs.",
+              },
+              {
+                day: "Sun (Mar 22)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 recovery ride.",
+              },
+            ],
+            "Wk 21 (Mar 23-29) - Build 1": [
+              { day: "Mon (Mar 23)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Mar 24)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Mar 25)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride. Main set: 2x15 min @ 95-105% FTP (Z4). +15min WU/CD.',
+              },
+              {
+                day: "Thu (Mar 26)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Mar 27)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Mar 28)",
+                type: "MTB",
+                details:
+                  "4:30 - 4500ft elev. Long ride with 3x15 min @ Z4 (Threshold) on climbs.",
+              },
+              {
+                day: "Sun (Mar 29)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 recovery ride.",
+              },
+            ],
+            "Wk 22 (Mar 30-Apr 5) - Recovery": [
+              { day: "Mon (Mar 30)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Mar 31)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Recovery" ride (Z1).',
+              },
+              {
+                day: "Wed (Apr 1)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Apr 2)",
+                type: "Peloton",
+                details: '0:30 - 30-min "Recovery" ride (Z1).',
+              },
+              {
+                day: "Fri (Apr 3)",
+                type: "Strength",
+                details: "0:30 - Phase 3 (Heavy Maint.), 1-2 sets only. Light.",
+              },
+              {
+                day: "Sat (Apr 4)",
+                type: "MTB",
+                details: "1:30 - Easy trail ride (Z2).",
+              },
+              {
+                day: "Sun (Apr 5)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+            ],
+            "Wk 23 (Apr 6-12) - Specialty 1": [
+              { day: "Mon (Apr 6)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Apr 7)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Apr 8)",
+                type: "Peloton",
+                details:
+                  '1:00 - 45-min "Power Zone Max" ride (Z5). Main set: 6x3 min @ 110-120% FTP. +15min WU/CD. (Optional: 0:20 Start Sim)',
+              },
+              {
+                day: "Thu (Apr 9)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Apr 10)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Apr 11)",
+                type: "MTB",
+                details:
+                  '4:00 - Stage Race Sim: 4h, 4000ft. 3x15m @ Z4, 4x3m @ Z5 ("Kitchen Sink").',
+              },
+              {
+                day: "Sun (Apr 12)",
+                type: "MTB",
+                details:
+                  "3:00 - Stage Race Sim: 3h, 3000ft. Fatigued ride. Steady Z2, push Z3 on climbs.",
+              },
+            ],
+            "Wk 24 (Apr 13-19) - Specialty 2": [
+              { day: "Mon (Apr 13)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Apr 14)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Apr 15)",
+                type: "Peloton",
+                details:
+                  '1:15 - 60-min "Power Zone" ride (Z4). Main set: 2x20 min @ 95-100% FTP. +15min WU/CD. (Optional: 0:20 Start Sim)',
+              },
+              {
+                day: "Thu (Apr 16)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Apr 17)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Apr 18)",
+                type: "MTB",
+                details:
+                  '4:30 - Stage Race Sim: 4.5h, 4500ft. 2x20m @ Z4, 5x3m @ Z5 ("Kitchen Sink").',
+              },
+              {
+                day: "Sun (Apr 19)",
+                type: "MTB",
+                details:
+                  "3:30 - Stage Race Sim: 3.5h, 3500ft. Fatigued ride. Steady Z3.",
+              },
+            ],
+            "Wk 25 (Apr 20-26) - Specialty Peak": [
+              { day: "Mon (Apr 20)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Apr 21)",
+                type: "Strength",
+                details: "1:00 - Phase 3 (Heavy Maint.) Workout (Table 5)",
+              },
+              {
+                day: "Wed (Apr 22)",
+                type: "Peloton",
+                details:
+                  '1:00 - 45-min "HIIT" ride (Z5). Main set: 5x4 min @ Z5. +15min WU/CD. (Optional: 0:20 Start Sim)',
+              },
+              {
+                day: "Thu (Apr 23)",
+                type: "Peloton",
+                details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Fri (Apr 24)",
+                type: "Strength",
+                details:
+                  "1:15 - Phase 3 (Heavy Maint.) Workout (Table 5) + Core (Table 7)",
+              },
+              {
+                day: "Sat (Apr 25)",
+                type: "MTB",
+                details:
+                  "5:00 - Peak Stage Race Sim: 5h, 5000ft. 2x20m @ Z4, 4x4m @ Z5.",
+              },
+              {
+                day: "Sun (Apr 26)",
+                type: "MTB",
+                details:
+                  "4:00 - Peak Stage Race Sim: 4h, 4000ft. Fatigued ride. Steady Z3.",
+              },
+            ],
+            "Wk 26 (Apr 27-May 3) - Recovery": [
+              { day: "Mon (Apr 27)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (Apr 28)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Recovery" ride (Z1).',
+              },
+              {
+                day: "Wed (Apr 29)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              {
+                day: "Thu (Apr 30)",
+                type: "Peloton",
+                details: '0:30 - 30-min "Recovery" ride (Z1).',
+              },
+              {
+                day: "Fri (May 1)",
+                type: "Strength",
+                details: "0:30 - Phase 3 (Heavy Maint.), 1-2 sets only. Light.",
+              },
+              {
+                day: "Sat (May 2)",
+                type: "MTB",
+                details: "1:30 - Easy trail ride (Z2).",
+              },
+              {
+                day: "Sun (May 3)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+            ],
+            "Wk 27 (May 4-10) - Taper 1": [
+              { day: "Mon (May 4)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (May 5)",
+                type: "Strength",
+                details: "0:45 - Phase 4 (Race Maint.) Workout (Table 6)",
+              },
+              {
+                day: "Wed (May 6)",
+                type: "Peloton",
+                details:
+                  '1:00 - 45-min "Power Zone" ride. 2x5m @ Z4, 2x2m @ Z5. +15min WU/CD.',
+              },
+              {
+                day: "Thu (May 7)",
+                type: "Peloton",
+                details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).',
+              },
+              { day: "Fri (May 8)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Sat (May 9)",
+                type: "MTB",
+                details: "3:00 - Taper Sim: 3h, 3000ft. 2x10m @ Z4, 2x3m @ Z5.",
+              },
+              {
+                day: "Sun (May 10)",
+                type: "MTB",
+                details: "2:00 - 2000ft elev. Z2 endurance.",
+              },
+            ],
+            "Wk 28 (May 11-17) - Taper 2": [
+              { day: "Mon (May 11)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Tue (May 12)",
+                type: "Strength",
+                details: "0:30 - Phase 4 (Race Maint.) Workout (Table 6)",
+              },
+              {
+                day: "Wed (May 13)",
+                type: "Peloton",
+                details:
+                  '0:45 - 45-min ride. "Openers": 3x3 min @ Z4. Rest Z1.',
+              },
+              {
+                day: "Thu (May 14)",
+                type: "Peloton",
+                details: '0:45 - 45-min "Power Zone Endurance" ride (Z2).',
+              },
+              { day: "Fri (May 15)", type: "Rest", details: "Full rest day." },
+              {
+                day: "Sat (May 16)",
+                type: "MTB",
+                details: "1:30 - Easy trail ride (Z2). Final check of bike.",
+              },
+              {
+                day: "Sun (May 17)",
+                type: "Peloton",
+                details: '0:45 - 45-min ride. "Openers": 2x3 min @ Z4.',
+              },
+            ],
+            "Wk 29 (May 18-24) - Race Week 1": [
+              {
+                day: "Mon (May 18)",
+                type: "Rest",
+                details: "Travel Day. Hydrate.",
+              },
+              { day: "Tue (May 19)", type: "Rest", details: "Travel Day." },
+              {
+                day: "Wed (May 20)",
+                type: "MTB",
+                details:
+                  "0:45 - Easy spin on-site if possible (Z1/Z2). Hydrate.",
+              },
+              {
+                day: "Thu (May 21)",
+                type: "MTB",
+                details: '0:30 - 30-min Z1 spin + 3 x 1 min "Openers" @ Z4.',
+              },
+              {
+                day: "Fri (May 22)",
+                type: "Rest",
+                details: "Final prep. Or 20-min Z1 leg spin.",
+              },
+              {
+                day: "Sat (May 23)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 1",
+              },
+              {
+                day: "Sun (May 24)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 2",
+              },
+            ],
+            "Wk 30 (May 25-31) - Race Week 2": [
+              {
+                day: "Mon (May 25)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 3",
+              },
+              {
+                day: "Tue (May 26)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 4",
+              },
+              {
+                day: "Wed (May 27)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 5",
+              },
+              {
+                day: "Thu (May 28)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 6",
+              },
+              {
+                day: "Fri (May 29)",
+                type: "RACE",
+                details: "RACE DAY: BC Bike Race - Day 7",
+              },
+              {
+                day: "Sat (May 30)",
+                type: "Rest",
+                details: "Congratulations. Begin recovery.",
+              },
+              { day: "Sun (May 31)", type: "Rest", details: "Total Rest" },
+            ],
+          },
+        };
 
-            // This planData is now a direct copy of Tables 8.1 - 8.28
-            const planData = {
-                phase1: {
-                    'Wk 1 (Nov 4-10)': [
-                        { day: 'Mon (Nov 4)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Nov 5)', type: 'Strength', details: '0:45 - Phase 1 Workout (Table 3)' },
-                        { day: 'Wed (Nov 6)', type: 'Peloton', details: '1:00 - 45-min "Climb" ride (Z3/Z4). +15min WU/CD.' },
-                        { day: 'Thu (Nov 7)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Nov 8)', type: 'Strength', details: '1:00 - Phase 1 Workout (Table 3) + Core (Table 7)' },
-                        { day: 'Sat (Nov 9)', type: 'MTB', details: '2:30 - 2000ft elev. Steady Z2, push Z3 on climbs.' },
-                        { day: 'Sun (Nov 10)', type: 'X-Train', details: '0:30 - Easy aerobic run (Z2), steady pace.' }
-                    ],
-                    'Wk 2 (Nov 11-17)': [
-                        { day: 'Mon (Nov 11)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Nov 12)', type: 'Strength', details: '0:45 - Phase 1 Workout (Table 3)' },
-                        { day: 'Wed (Nov 13)', type: 'Peloton', details: '1:15 - 60-min "Power Zone" ride. Main set: 3x8 min @ Z4. +15min WU/CD.' },
-                        { day: 'Thu (Nov 14)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Nov 15)', type: 'Strength', details: '1:00 - Phase 1 Workout (Table 3) + Core (Table 7)' },
-                        { day: 'Sat (Nov 16)', type: 'MTB', details: '3:00 - 2500ft+ elev. Long steady endurance, Z3 on climbs.' },
-                        { day: 'Sun (Nov 17)', type: 'X-Train', details: '0:45 - Steady aerobic run (Z2).' }
-                    ],
-                    'Wk 3 (Nov 18-24)': [
-                        { day: 'Mon (Nov 18)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Nov 19)', type: 'Strength', details: '0:45 - Phase 1 Workout (Table 3)' },
-                        { day: 'Wed (Nov 20)', type: 'Peloton', details: '1:15 - 60-min "Climb" ride. Focus sustained Z3/Z4. +15min WU/CD.' },
-                        { day: 'Thu (Nov 21)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Nov 22)', type: 'Strength', details: '1:00 - Phase 1 Workout (Table 3) + Core (Table 7)' },
-                        { day: 'Sat (Nov 23)', type: 'MTB', details: '3:30 - 3000ft+ elev. Final long build. Test race nutrition.' },
-                        { day: 'Sun (Nov 24)', type: 'Peloton', details: '0:45 - 45-min "Low Impact" ride (Z1/Z2). Active recovery.' }
-                    ],
-                    'Wk 4 (Nov 25 - Dec 1)': [
-                        { day: 'Mon (Nov 25)', type: 'Rest', details: 'Full rest day.' },
-                        { day: 'Tue (Nov 26)', type: 'Peloton', details: '0:45 - 45-min "Power Zone Endurance" ride (Z2). Easy spin.' },
-                        { day: 'Wed (Nov 27)', type: 'Strength', details: '0:30 - Phase 1 (Table 3), 1-2 sets only. Light.' },
-                        { day: 'Thu (Nov 28)', type: 'Peloton', details: '0:45 - 45-min "Recovery" ride (Z1/Z2). High cadence.' },
-                        { day: 'Fri (Nov 29)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sat (Nov 30)', type: 'MTB', details: '1:30 - Easy spin on trails (Z2). Focus on flow.' },
-                        { day: 'Sun (Dec 1)', type: 'Peloton', details: '0:45 - 30-min PZE ride (Z2) + 3x1 min @ Z4 "Openers".' }
-                    ],
-                    'Wk 5 (Dec 16-22)': [
-                        { day: 'Mon (Dec 16)', type: 'Rest', details: 'Full rest day.' },
-                        { day: 'Tue (Dec 17)', type: 'Peloton', details: '0:45 - 45-min "Power Zone" ride. "Openers": 3x2m @ Z4, 1m @ Z5.' },
-                        { day: 'Wed (Dec 18)', type: 'Rest', details: '0:00 - Hydrate, mobility.' },
-                        { day: 'Thu (Dec 19)', type: 'MTB', details: '0:30 - Easy spin (Z1), 3x30s spin-ups. Check equipment.' },
-                        { day: 'Fri (Dec 20)', type: 'RACE', details: '~4:00 - RACE DAY: Fat Chuck\'s Revenge (45 miles)' },
-                        { day: 'Sat (Dec 21)', type: 'Rest', details: 'Off. Or 20-min Z1 spin if very sore.' },
-                        { day: 'Sun (Dec 22)', type: 'MTB', details: '1:00 - Very easy recovery ride (Z1/Z2). Focus on blood flow.' }
-                    ],
-                    'Wk 6 (Dec 23-29)': [
-                        { day: 'Mon (Dec 23)', type: 'Rest', details: 'Full rest day.' },
-                        { day: 'Tue (Dec 24)', type: 'Peloton', details: '0:30 - 30-min "Recovery" ride (Z1). Easy spin.' },
-                        { day: 'Wed (Dec 25)', type: 'Rest', details: 'Optional Z1 spin.' },
-                        { day: 'Thu (Dec 26)', type: 'Peloton', details: '0:45 - 45-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Dec 27)', type: 'X-Train', details: '0:30 - Easy aerobic run (Z2).' },
-                        { day: 'Sat (Dec 28)', type: 'MTB', details: '1:15 - Easy trail ride (Z2).' },
-                        { day: 'Sun (Dec 29)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' }
-                    ],
-                    'Wk 7 (Dec 30 - Jan 5)': [
-                        { day: 'Mon (Dec 30)', type: 'Peloton', details: '1:00 - 45-min "Power Zone" ride. 4x5 min @ Z4. +15min WU/CD.' },
-                        { day: 'Tue (Dec 31)', type: 'Double', details: '1:00 - Relay Sim: AM: 30-min Peloton HIIT (Z5). PM: 30-min Run (Z2).' },
-                        { day: 'Wed (Jan 1)', type: 'Rest', details: 'Hydrate, mobility.' },
-                        { day: 'Thu (Jan 2)', type: 'Peloton', details: '0:30 - 30-min ride with "Openers": 3x1 min @ Z4.' },
-                        { day: 'Fri (Jan 3)', type: 'RACE', details: 'Varies - RACE DAY: Excruciate Exam Relay' },
-                        { day: 'Sat (Jan 4)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sun (Jan 5)', type: 'Peloton', details: '0:45 - 45-min "Recovery" ride (Z1).' }
-                    ]
+        const chartColors = {
+          z1: "rgba(203, 213, 225, 0.7)",
+          z2: "rgba(56, 189, 248, 0.7)",
+          z3: "rgba(34, 197, 94, 0.7)",
+          z4: "rgba(249, 115, 22, 0.7)",
+          z5: "rgba(239, 68, 68, 0.7)",
+          border: "rgba(100, 116, 139, 1)",
+          line: "rgba(20, 83, 45, 1)",
+        };
+
+        const renderTrainingLoadChart = () => {
+          const ctx = document
+            .getElementById("trainingLoadChart")
+            .getContext("2d");
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: trainingLoadData.labels,
+              datasets: [
+                {
+                  label: "Planned Weekly Training Hours",
+                  data: trainingLoadData.data,
+                  borderColor: chartColors.line,
+                  backgroundColor: "rgba(20, 83, 45, 0.1)",
+                  fill: true,
+                  tension: 0.3,
                 },
-                phase2: {
-                    'Wk 8 (Jan 6-12)': [
-                        { day: 'Mon (Jan 6)', type: 'Rest', details: 'Full rest week.' },
-                        { day: 'Tue (Jan 7)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Wed (Jan 8)', type: 'Peloton', details: '0:30 - Optional: 30-min "Recovery" ride (Z1).' },
-                        { day: 'Thu (Jan 9)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Fri (Jan 10)', type: 'Peloton', details: '0:30 - Optional: 30-min "Recovery" ride (Z1).' },
-                        { day: 'Sat (Jan 11)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sun (Jan 12)', type: 'Peloton', details: '0:45 - 45-min "Low Impact" ride (Z1/Z2).' }
-                    ],
-                    'Wk 9 (Jan 13-19)': [
-                        { day: 'Mon (Jan 13)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Jan 14)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Jan 15)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (Jan 16)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Jan 17)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Jan 18)', type: 'MTB', details: '1:30 - 1500ft elev. Steady Z2 endurance.' },
-                        { day: 'Sun (Jan 19)', type: 'MTB', details: '1:30 - 1500ft elev. Back-to-back Z2.' }
-                    ],
-                    'Wk 10 (Jan 20-26)': [
-                        { day: 'Mon (Jan 20)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Jan 21)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Jan 22)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (Jan 23)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Jan 24)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Jan 25)', type: 'MTB', details: '2:00 - 2000ft elev. Steady Z2.' },
-                        { day: 'Sun (Jan 26)', type: 'MTB', details: '2:00 - 2000ft elev. Back-to-back Z2.' }
-                    ],
-                    'Wk 11 (Jan 27 - Feb 2)': [
-                        { day: 'Mon (Jan 27)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Jan 28)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Jan 29)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (Jan 30)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Jan 31)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Feb 1)', type: 'MTB', details: '2:30 - 2500ft elev. Steady Z2.' },
-                        { day: 'Sun (Feb 2)', type: 'MTB', details: '2:00 - 2000ft elev. Back-to-back Z2.' }
-                    ],
-                    'Wk 12 (Feb 3-9)': [
-                        { day: 'Mon (Feb 3)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Feb 4)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Feb 5)', type: 'Peloton', details: '1:30 - 90-min PZE ride. Include 3x10 min Z3.' },
-                        { day: 'Thu (Feb 6)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Feb 7)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Feb 8)', type: 'MTB', details: '3:00 - 3000ft elev. Long steady endurance.' },
-                        { day: 'Sun (Feb 9)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 endurance.' }
-                    ],
-                    'Wk 13 (Feb 10-16)': [
-                        { day: 'Mon (Feb 10)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Feb 11)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Feb 12)', type: 'Peloton', details: '1:30 - 75-min "Power Zone" ride. Main set: 3x15 min @ Z3. +15min WU/CD.' },
-                        { day: 'Thu (Feb 13)', type: 'Peloton', details: '1:15 - 75-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Feb 14)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Feb 15)', type: 'MTB', details: '3:30 - 3500ft elev. Long steady endurance.' },
-                        { day: 'Sun (Feb 16)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 endurance.' }
-                    ],
-                    'Wk 14 (Feb 17-23)': [
-                        { day: 'Mon (Feb 17)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Feb 18)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Feb 19)', type: 'Peloton', details: '1:30 - 75-min "Power Zone" ride. Main set: 2x20 min @ Z3. +15min WU/CD.' },
-                        { day: 'Thu (Feb 20)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Feb 21)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Feb 22)', type: 'MTB', details: '4:00 - 4000ft elev. Long steady endurance.' },
-                        { day: 'Sun (Feb 23)', type: 'MTB', details: '2:30 - 2500ft elev. Z2 endurance.' }
-                    ],
-                    'Wk 15 (Feb 24 - Mar 2)': [
-                        { day: 'Mon (Feb 24)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Feb 25)', type: 'Strength', details: '1:00 - Phase 2 Workout (Table 4)' },
-                        { day: 'Wed (Feb 26)', type: 'Peloton', details: '1:30 - 75-min "Climb" ride. Focus sustained Z3. +15min WU/CD.' },
-                        { day: 'Thu (Feb 27)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Feb 28)', type: 'Strength', details: '1:15 - Phase 2 Workout (Table 4) + Core (Table 7)' },
-                        { day: 'Sat (Mar 1)', type: 'MTB', details: '5:00 - 5000ft elev. Longest Z2 ride. Test nutrition.' },
-                        { day: 'Sun (Mar 2)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 endurance.' }
-                    ],
-                    'Wk 16 (Mar 3-9)': [
-                        { day: 'Mon (Mar 3)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Mar 4)', type: 'Peloton', details: '0:45 - 45-min "Recovery" ride (Z1).' },
-                        { day: 'Wed (Mar 5)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (Mar 6)', type: 'X-Train', details: '0:30 - Easy run (Z2).' },
-                        { day: 'Fri (Mar 7)', type: 'Strength', details: '0:45 - Phase 2 (Table 4), 1-2 sets only. Light.' },
-                        { day: 'Sat (Mar 8)', type: 'MTB', details: '1:30 - Easy trail ride (Z2).' },
-                        { day: 'Sun (Mar 9)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' }
-                    ]
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  enabled: true,
+                  mode: "index",
+                  intersect: false,
                 },
-                phase3: {
-                    'Wk 17 (Mar 10-16)': [
-                        { day: 'Mon (Mar 10)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Mar 11)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Mar 12)', type: 'Peloton', details: '1:15 - 60-min "Power Zone" ride. Main set: 4x8 min @ 95-105% FTP. +15min WU/CD.' },
-                        { day: 'Thu (Mar 13)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Mar 14)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Mar 15)', type: 'MTB', details: '4:00 - 4000ft elev. Long ride with 3x20 min @ Z3 on climbs.' },
-                        { day: 'Sun (Mar 16)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 recovery ride.' }
-                    ],
-                    'Wk 18 (Mar 17-23)': [
-                        { day: 'Mon (Mar 17)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Mar 18)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Mar 19)', type: 'Peloton', details: '1:15 - 60-min "Power Zone" ride. Main set: 3x10 min @ 95-105% FTP. +15min WU/CD.' },
-                        { day: 'Thu (Mar 20)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Mar 21)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Mar 22)', type: 'MTB', details: '4:00 - 4000ft elev. Long ride with 2x30 min @ Z3 on climbs.' },
-                        { day: 'Sun (Mar 23)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 recovery ride.' }
-                    ],
-                    'Wk 19 (Mar 24-30)': [
-                        { day: 'Mon (Mar 24)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Mar 25)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Mar 26)', type: 'Peloton', details: '1:15 - 60-min "Power Zone" ride. Main set: 2x15 min @ 95-105% FTP. +15min WU/CD.' },
-                        { day: 'Thu (Mar 27)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Mar 28)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Mar 29)', type: 'MTB', details: '4:30 - 4500ft elev. Long ride with 3x15 min @ Z4 on climbs.' },
-                        { day: 'Sun (Mar 30)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 recovery ride.' }
-                    ],
-                    'Wk 20 (Mar 31 - Apr 6)': [
-                        { day: 'Mon (Mar 31)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Apr 1)', type: 'Peloton', details: '0:45 - 45-min "Recovery" ride (Z1).' },
-                        { day: 'Wed (Apr 2)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (Apr 3)', type: 'X-Train', details: '0:30 - Easy run (Z2).' },
-                        { day: 'Fri (Apr 4)', type: 'Strength', details: '0:30 - Phase 3 (Table 5), 1-2 sets only. Light.' },
-                        { day: 'Sat (Apr 5)', type: 'MTB', details: '1:30 - Easy trail ride (Z2).' },
-                        { day: 'Sun (Apr 6)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' }
-                    ],
-                    'Wk 21 (Apr 7-13)': [
-                        { day: 'Mon (Apr 7)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Apr 8)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Apr 9)', type: 'Peloton', details: '1:00 - 45-min "Power Zone Max" ride. Main set: 6x3 min @ 110-120% FTP. +15min WU/CD.' },
-                        { day: 'Thu (Apr 10)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Apr 11)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Apr 12)', type: 'MTB', details: '4:00 - Stage Race Sim: 4h, 4000ft. 3x15m @ Z4, 4x3m @ Z5.' },
-                        { day: 'Sun (Apr 13)', type: 'MTB', details: '3:00 - Stage Race Sim: 3h, 3000ft. Fatigued ride. Steady Z2, push Z3 on climbs.' }
-                    ],
-                    'Wk 22 (Apr 14-20)': [
-                        { day: 'Mon (Apr 14)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Apr 15)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Apr 16)', type: 'Peloton', details: '1:15 - 60-min "Power Zone" ride. Main set: 2x20 min @ 95-100% FTP. +15min WU/CD.' },
-                        { day: 'Thu (Apr 17)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Apr 18)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Apr 19)', type: 'MTB', details: '4:30 - Stage Race Sim: 4.5h, 4500ft. "Kitchen Sink" 2x20m @ Z4, 5x3m @ Z5.' },
-                        { day: 'Sun (Apr 20)', type: 'MTB', details: '3:30 - Stage Race Sim: 3.5h, 3500ft. Fatigued ride. Steady Z3.' }
-                    ],
-                    'Wk 23 (Apr 21-27)': [
-                        { day: 'Mon (Apr 21)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Apr 22)', type: 'Strength', details: '1:00 - Phase 3 Workout (Table 5)' },
-                        { day: 'Wed (Apr 23)', type: 'Peloton', details: '1:00 - 45-min "HIIT" ride. Main set: 5x4 min @ Z5 (>106% FTP). +15min WU/CD.' },
-                        { day: 'Thu (Apr 24)', type: 'Peloton', details: '1:30 - 90-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (Apr 25)', type: 'Strength', details: '1:15 - Phase 3 Workout (Table 5) + Core (Table 7)' },
-                        { day: 'Sat (Apr 26)', type: 'MTB', details: '5:00 - Peak Stage Race Sim: 5h, 5000ft. 2x20m @ Z4, 4x4m @ Z5.' },
-                        { day: 'Sun (Apr 27)', type: 'MTB', details: '4:00 - Peak Stage Race Sim: 4h, 4000ft. Fatigued ride. Steady Z3.' }
-                    ],
-                    'Wk 24 (Apr 28 - May 4)': [
-                        { day: 'Mon (Apr 28)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (Apr 29)', type: 'Peloton', details: '0:45 - 45-min "Recovery" ride (Z1).' },
-                        { day: 'Wed (Apr 30)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Thu (May 1)', type: 'X-Train', details: '0:30 - Easy run (Z2).' },
-                        { day: 'Fri (May 2)', type: 'Strength', details: '0:30 - Phase 3 (Table 5), 1-2 sets only. Light.' },
-                        { day: 'Sat (May 3)', type: 'MTB', details: '1:30 - Easy trail ride (Z2).' },
-                        { day: 'Sun (May 4)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' }
-                    ],
-                    'Wk 25 (May 5-11)': [
-                        { day: 'Mon (May 5)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (May 6)', type: 'Strength', details: '0:45 - Phase 4 Workout (Table 6)' },
-                        { day: 'Wed (May 7)', type: 'Peloton', details: '1:00 - 45-min "Power Zone" ride. 2x5m @ Z4, 2x2m @ Z5. +15min WU/CD.' },
-                        { day: 'Thu (May 8)', type: 'Peloton', details: '1:00 - 60-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (May 9)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sat (May 10)', type: 'MTB', details: '3:00 - Taper Sim: 3h, 3000ft. 2x10m @ Z4, 2x3m @ Z5.' },
-                        { day: 'Sun (May 11)', type: 'MTB', details: '2:00 - 2000ft elev. Z2 endurance.' }
-                    ],
-                    'Wk 26 (May 12-18)': [
-                        { day: 'Mon (May 12)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Tue (May 13)', type: 'Strength', details: '0:30 - Phase 4 Workout (Table 6)' },
-                        { day: 'Wed (May 14)', type: 'Peloton', details: '0:45 - 45-min ride. "Openers": 3x3 min @ Z4. Rest Z1.' },
-                        { day: 'Thu (May 15)', type: 'Peloton', details: '0:45 - 45-min "Power Zone Endurance" ride (Z2).' },
-                        { day: 'Fri (May 16)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sat (May 17)', type: 'MTB', details: '1:30 - Easy trail ride (Z2). Final check of bike.' },
-                        { day: 'Sun (May 18)', type: 'Peloton', details: '0:45 - 45-min ride. "Openers": 2x3 min @ Z4.' }
-                    ],
-                    'Wk 27 (May 19-25)': [
-                        { day: 'Mon (May 19)', type: 'Rest', details: 'Travel Day. Hydrate.' },
-                        { day: 'Tue (May 20)', type: 'MTB', details: '0:45 - Easy spin on-site if possible (Z1/Z2).' },
-                        { day: 'Wed (May 21)', type: 'MTB', details: '0:30 - 30-min Z1 spin + 3x1 min "Openers" @ Z4.' },
-                        { day: 'Thu (May 22)', type: 'Rest', details: 'Final prep. Or 20-min Z1 leg spin.' },
-                        { day: 'Fri (May 23)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 1' },
-                        { day: 'Sat (May 24)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 2' },
-                        { day: 'Sun (May 25)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 3' }
-                    ],
-                    'Wk 28 (May 26 - Jun 1)': [
-                        { day: 'Mon (May 26)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 4' },
-                        { day: 'Tue (May 27)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 5' },
-                        { day: 'Wed (May 28)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 6' },
-                        { day: 'Thu (May 29)', type: 'RACE', details: 'RACE DAY: BC Bike Race - Day 7. Congrats!' },
-                        { day: 'Fri (May 30)', type: 'Rest', details: 'Congratulations. Begin recovery.' },
-                        { day: 'Sat (May 31)', type: 'Rest', details: 'Total Rest' },
-                        { day: 'Sun (Jun 1)', type: 'Rest', details: 'Total Rest' }
-                    ]
-                }
-            };
+              },
+              scales: {
+                y: {
+                  title: {
+                    display: true,
+                    text: "Weekly Hours",
+                  },
+                  beginAtZero: true,
+                },
+              },
+            },
+          });
+        };
 
-            const chartColors = {
-                z1: 'rgba(203, 213, 225, 0.7)',
-                z2: 'rgba(56, 189, 248, 0.7)',
-                z3: 'rgba(34, 197, 94, 0.7)',
-                z4: 'rgba(249, 115, 22, 0.7)',
-                z5: 'rgba(239, 68, 68, 0.7)',
-                border: 'rgba(100, 116, 139, 1)',
-                line: 'rgba(20, 83, 45, 1)'
-            };
+        const renderIntensityChart = (phaseKey, canvasId) => {
+          const ctx = document.getElementById(canvasId).getContext("2d");
+          const phase = phaseIntensityData[phaseKey];
+          new Chart(ctx, {
+            type: "doughnut",
+            data: {
+              labels: [
+                "Z1 (Recov)",
+                "Z2 (Endur)",
+                "Z3 (Tempo)",
+                "Z4 (Thresh)",
+                "Z5 (VO2)",
+              ],
+              datasets: [
+                {
+                  label: "Time in Zone %",
+                  data: phase.data,
+                  backgroundColor: [
+                    chartColors.z1,
+                    chartColors.z2,
+                    chartColors.z3,
+                    chartColors.z4,
+                    chartColors.z5,
+                  ],
+                  borderColor: "#ffffff",
+                  borderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  position: "right",
+                  labels: {
+                    boxWidth: 12,
+                    font: { size: 10 },
+                  },
+                },
+                title: {
+                  display: false,
+                  text: phase.label,
+                },
+              },
+            },
+          });
+        };
 
-            const renderTrainingLoadChart = () => {
-                const ctx = document.getElementById('trainingLoadChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: trainingLoadData.labels,
-                        datasets: [{
-                            label: 'Planned Weekly Training Hours',
-                            data: trainingLoadData.data,
-                            borderColor: chartColors.line,
-                            backgroundColor: 'rgba(20, 83, 45, 0.1)',
-                            fill: true,
-                            tension: 0.3
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false,
-                            }
-                        },
-                        scales: {
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Weekly Hours'
-                                },
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            };
-
-            const renderIntensityChart = (phaseKey, canvasId) => {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                const phase = phaseIntensityData[phaseKey];
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Z1 (Recov)', 'Z2 (Endur)', 'Z3 (Tempo)', 'Z4 (Thresh)', 'Z5 (VO2)'],
-                        datasets: [{
-                            label: 'Time in Zone %',
-                            data: phase.data,
-                            backgroundColor: [
-                                chartColors.z1,
-                                chartColors.z2,
-                                chartColors.z3,
-                                chartColors.z4,
-                                chartColors.z5,
-                            ],
-                            borderColor: '#ffffff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    boxWidth: 12,
-                                    font: { size: 10 }
-                                }
-                            },
-                            title: {
-                                display: false,
-                                text: phase.label
-                            }
-                        }
-                    }
-                });
-            };
-
-            const createDayCard = (day) => {
-                const card = document.createElement('div');
-                card.className = 'day-card';
-                card.innerHTML = `
+        const createDayCard = (day) => {
+          const card = document.createElement("div");
+          card.className = "day-card";
+          card.innerHTML = `
                     <h4>${day.day}</h4>
                     <p>${day.details}</p>
                     <span class="inline-block bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-xs font-medium">${day.type}</span>
                 `;
-                return card;
-            };
+          return card;
+        };
 
-            const renderPhase = (phaseId, phaseData) => {
-                const navContainer = document.getElementById(`${phaseId}-nav`);
-                const contentContainer = document.getElementById(`${phaseId}-content`);
+        const renderPhase = (phaseId, phaseData) => {
+          const navContainer = document.getElementById(`${phaseId}-nav`);
+          const contentContainer = document.getElementById(
+            `${phaseId}-content`
+          );
 
-                navContainer.innerHTML = '';
-                contentContainer.innerHTML = '';
+          navContainer.innerHTML = "";
+          contentContainer.innerHTML = "";
 
-                let firstWeek = true;
-                Object.keys(phaseData).forEach(weekName => {
-                    const weekButton = document.createElement('button');
-                    weekButton.className = 'week-nav-button';
-                    weekButton.textContent = weekName;
-                    weekButton.dataset.weekId = `week-${phaseId}-${weekName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+          let firstWeek = true;
+          Object.keys(phaseData).forEach((weekName) => {
+            const weekButton = document.createElement("button");
+            weekButton.className = "week-nav-button";
+            weekButton.textContent = weekName;
+            weekButton.dataset.weekId = `week-${phaseId}-${weekName.replace(
+              /[^a-zA-Z0-9]/g,
+              "-"
+            )}`;
 
-                    const weekContent = document.createElement('div');
-                    weekContent.id = weekButton.dataset.weekId;
-                    weekContent.className = 'week-content-container grid grid-cols-1 md:grid-cols-7 gap-2';
-                    weekContent.classList.add('hidden');
+            const weekContent = document.createElement("div");
+            weekContent.id = weekButton.dataset.weekId;
+            weekContent.className =
+              "week-content-container grid grid-cols-1 md:grid-cols-7 gap-2";
+            weekContent.classList.add("hidden");
 
-                    phaseData[weekName].forEach(day => {
-                        weekContent.appendChild(createDayCard(day));
-                    });
+            phaseData[weekName].forEach((day) => {
+              weekContent.appendChild(createDayCard(day));
+            });
 
-                    if (firstWeek) {
-                        weekButton.classList.add('active');
-                        weekContent.classList.remove('hidden');
-                        firstWeek = false;
-                    }
+            if (firstWeek) {
+              weekButton.classList.add("active");
+              weekContent.classList.remove("hidden");
+              firstWeek = false;
+            }
 
-                    weekButton.addEventListener('click', () => {
-                        navContainer.querySelectorAll('.week-nav-button').forEach(btn => btn.classList.remove('active'));
-                        weekButton.classList.add('active');
-                        contentContainer.querySelectorAll('.week-content-container').forEach(content => content.classList.add('hidden'));
-                        document.getElementById(weekButton.dataset.weekId).classList.remove('hidden');
-                    });
+            weekButton.addEventListener("click", () => {
+              navContainer
+                .querySelectorAll(".week-nav-button")
+                .forEach((btn) => btn.classList.remove("active"));
+              weekButton.classList.add("active");
+              contentContainer
+                .querySelectorAll(".week-content-container")
+                .forEach((content) => content.classList.add("hidden"));
+              document
+                .getElementById(weekButton.dataset.weekId)
+                .classList.remove("hidden");
+            });
 
-                    navContainer.appendChild(weekButton);
-                    contentContainer.appendChild(weekContent);
-                });
-            };
+            navContainer.appendChild(weekButton);
+            contentContainer.appendChild(weekContent);
+          });
+        };
 
-            const setupNavigation = () => {
-                const tabs = document.querySelectorAll('.nav-tab');
-                const pages = document.querySelectorAll('.page-content');
-                const chartsRendered = {
-                    phase1: false,
-                    phase2: false,
-                    phase3: false,
-                };
+        const setupNavigation = () => {
+          const tabs = document.querySelectorAll(".nav-tab");
+          const pages = document.querySelectorAll(".page-content");
+          const chartsRendered = {
+            phase1: false,
+            phase2: false,
+            phase3: false,
+          };
 
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        tabs.forEach(t => t.classList.remove('active'));
-                        tab.classList.add('active');
+          tabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+              tabs.forEach((t) => t.classList.remove("active"));
+              tab.classList.add("active");
 
-                        const pageId = tab.dataset.page;
-                        pages.forEach(p => {
-                            if (p.id === pageId) {
-                                p.classList.remove('hidden');
-                            } else {
-                                p.classList.add('hidden');
-                            }
-                        });
+              const pageId = tab.dataset.page;
+              pages.forEach((p) => {
+                if (p.id === pageId) {
+                  p.classList.remove("hidden");
+                } else {
+                  p.classList.add("hidden");
+                }
+              });
 
-                        if (pageId === 'page-phase1' && !chartsRendered.phase1) {
-                            renderIntensityChart('phase1', 'phase1IntensityChart');
-                            chartsRendered.phase1 = true;
-                        } else if (pageId === 'page-phase2' && !chartsRendered.phase2) {
-                            renderIntensityChart('phase2', 'phase2IntensityChart');
-                            chartsRendered.phase2 = true;
-                        } else if (pageId === 'page-phase3' && !chartsRendered.phase3) {
-                            renderIntensityChart('phase3', 'phase3IntensityChart');
-                            chartsRendered.phase3 = true;
-                        }
-                    });
-                });
-            };
+              if (pageId === "page-phase1" && !chartsRendered.phase1) {
+                renderIntensityChart("phase1", "phase1IntensityChart");
+                chartsRendered.phase1 = true;
+              } else if (pageId === "page-phase2" && !chartsRendered.phase2) {
+                renderIntensityChart("phase2", "phase2IntensityChart");
+                chartsRendered.phase2 = true;
+              } else if (pageId === "page-phase3" && !chartsRendered.phase3) {
+                renderIntensityChart("phase3", "phase3IntensityChart");
+                chartsRendered.phase3 = true;
+              }
+            });
+          });
+        };
 
-            renderTrainingLoadChart();
-            setupNavigation();
+        renderTrainingLoadChart();
+        setupNavigation();
 
-            // Re-map phases to the new 3-phase structure
-            renderPhase('phase1', planData.phase1);
-            renderPhase('phase2', planData.phase2);
-            renderPhase('phase3', planData.phase3);
-
+        // Re-map phases to the 3-phase structure
+        renderPhase("phase1", {
+          "Wk 1 (Nov 3-9)": planData.phase1["Wk 1 (Nov 3-9)"],
+          "Wk 2 (Nov 10-16)": planData.phase1["Wk 2 (Nov 10-16)"],
+          "Wk 3 (Nov 17-23)": planData.phase1["Wk 3 (Nov 17-23)"],
+          "Wk 4 (Nov 24-30) - Taper 1": planData.phase1["Wk 4 (Nov 24-30)"],
+          "Wk 5 (Dec 1-7)": planData.phase1["Wk 5 (Dec 1-7)"],
+          "Wk 6 (Dec 8-14)": planData.phase1["Wk 6 (Dec 8-14)"],
+          "Wk 7 (Dec 15-21) - Race 1":
+            planData.phase1["Wk 7 (Dec 15-21) - Race 1"],
+          "Wk 8 (Dec 22-28) - Recover": planData.phase1["Wk 8 (Dec 22-28)"],
+          "Wk 9 (Dec 29-Jan 4) - Race 2":
+            planData.phase1["Wk 9 (Dec 29-Jan 4) - Race 2"],
         });
+        renderPhase("phase2", {
+          "Wk 10 (Jan 5-11) - Transition":
+            planData.phase2["Wk 10 (Jan 5-11) - Transition"],
+          "Wk 11 (Jan 12-18) - Base 1":
+            planData.phase2["Wk 11 (Jan 12-18) - Base 1"],
+          "Wk 12 (Jan 19-25)": planData.phase2["Wk 12 (Jan 19-25) - Base 1"],
+          "Wk 13 (Jan 26-Feb 1)":
+            planData.phase2["Wk 13 (Jan 26-Feb 1) - Base 1"],
+          "Wk 14 (Feb 2-8) - Base 2":
+            planData.phase2["Wk 14 (Feb 2-8) - Base 2"],
+          "Wk 15 (Feb 9-15)": planData.phase2["Wk 15 (Feb 9-15) - Base 2"],
+          "Wk 16 (Feb 16-22)": planData.phase2["Wk 16 (Feb 16-22) - Base 2"],
+          "Wk 17 (Feb 23-Mar 1)":
+            planData.phase2["Wk 17 (Feb 23-Mar 1) - Base 2"],
+          "Wk 18 (Mar 2-8) - Recovery":
+            planData.phase2["Wk 18 (Mar 2-8) - Recovery"],
+        });
+        renderPhase("phase3", {
+          "Wk 19 (Mar 9-15) - Build 1":
+            planData.phase3["Wk 19 (Mar 9-15) - Build 1"],
+          "Wk 20 (Mar 16-22)": planData.phase3["Wk 20 (Mar 16-22) - Build 1"],
+          "Wk 21 (Mar 23-29)": planData.phase3["Wk 21 (Mar 23-29) - Build 1"],
+          "Wk 22 (Mar 30-Apr 5) - Recovery":
+            planData.phase3["Wk 22 (Mar 30-Apr 5) - Recovery"],
+          "Wk 23 (Apr 6-12) - Specialty 1":
+            planData.phase3["Wk 23 (Apr 6-12) - Specialty 1"],
+          "Wk 24 (Apr 13-19) - Specialty 2":
+            planData.phase3["Wk 24 (Apr 13-19) - Specialty 2"],
+          "Wk 25 (Apr 20-26) - Peak Sim":
+            planData.phase3["Wk 25 (Apr 20-26) - Specialty Peak"],
+          "Wk 26 (Apr 27-May 3) - Recovery":
+            planData.phase3["Wk 26 (Apr 27-May 3) - Recovery"],
+          "Wk 27 (May 4-10) - Taper 1":
+            planData.phase3["Wk 27 (May 4-10) - Taper 1"],
+          "Wk 28 (May 11-17) - Taper 2":
+            planData.phase3["Wk 28 (May 11-17) - Taper 2"],
+          "Wk 29 (May 18-24) - Race Week 1":
+            planData.phase3["Wk 29 (May 18-24) - Race Week 1"],
+          "Wk 30 (May 25-31) - Race Week 2":
+            planData.phase3["Wk 30 (May 25-31) - Race Week 2"],
+        });
+      });
     </script>
-</body>
-
+  </body>
 </html>
