@@ -16,8 +16,10 @@
         --bg-card: #1a2b1e;
         --bg-card-alt: #1f3324;
         --bg-surface: #152219;
+        --bg-detail: #14231a;
         --border: #2d4a34;
         --border-light: #3a5c42;
+        --border-active: #4ade80;
         --text: #d4e4d8;
         --text-dim: #8ba692;
         --text-bright: #e8f5ec;
@@ -40,21 +42,17 @@
         --font-body: "DM Sans", sans-serif;
         --font-mono: "JetBrains Mono", monospace;
       }
-
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
-
       body {
         font-family: var(--font-body);
         background: var(--bg);
         color: var(--text);
         min-height: 100vh;
       }
-
-      /* ── Header ───────────────────────────── */
       header {
         background: var(--bg-surface);
         border-bottom: 1px solid var(--border);
@@ -88,7 +86,6 @@
       .logo span {
         font-size: 0.75rem;
         color: var(--text-dim);
-        font-weight: 400;
       }
       .header-meta {
         display: flex;
@@ -100,25 +97,20 @@
       .header-meta strong {
         color: var(--text);
       }
-
-      /* ── Nav Tabs ──────────────────────────── */
       .tab-bar {
         background: var(--bg-surface);
         border-bottom: 1px solid var(--border);
         padding: 0 1.5rem;
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
       }
       .tab-bar-inner {
         max-width: 1400px;
         margin: 0 auto;
         display: flex;
-        gap: 0;
       }
       .tab-btn {
         font-family: var(--font-mono);
         font-size: 0.75rem;
-        font-weight: 400;
         color: var(--text-dim);
         background: none;
         border: none;
@@ -135,8 +127,6 @@
         color: var(--accent);
         border-bottom-color: var(--accent);
       }
-
-      /* ── Main Layout ──────────────────────── */
       main {
         max-width: 1400px;
         margin: 0 auto;
@@ -148,8 +138,6 @@
       .page.active {
         display: block;
       }
-
-      /* ── Week Navigation ──────────────────── */
       .week-strip {
         display: flex;
         gap: 0.375rem;
@@ -189,8 +177,6 @@
         border-color: var(--race-gold);
         color: #000;
       }
-
-      /* ── Week Header ──────────────────────── */
       .week-header {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -218,8 +204,6 @@
       .week-header .meta strong {
         color: var(--text);
       }
-
-      /* ── Day Grid ─────────────────────────── */
       .day-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
@@ -235,7 +219,6 @@
           grid-template-columns: 1fr;
         }
       }
-
       .day-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -244,14 +227,18 @@
         display: flex;
         flex-direction: column;
         gap: 0.35rem;
-        transition: border-color 0.15s;
-        min-height: 130px;
+        transition: all 0.15s;
+        min-height: 120px;
+        cursor: pointer;
+        user-select: none;
+        position: relative;
       }
       .day-card:hover {
         border-color: var(--border-light);
       }
       .day-card.rest {
         opacity: 0.55;
+        cursor: default;
       }
       .day-card.race {
         border-color: var(--race-gold-dim);
@@ -261,7 +248,11 @@
           rgba(251, 191, 36, 0.08)
         );
       }
-
+      .day-card.selected {
+        border-color: var(--border-active);
+        background: var(--bg-card-alt);
+        box-shadow: 0 0 0 1px var(--border-active);
+      }
       .day-label {
         font-family: var(--font-mono);
         font-size: 0.65rem;
@@ -308,36 +299,146 @@
         background: rgba(248, 113, 113, 0.15);
         color: var(--z5);
       }
-
       .day-details {
         font-size: 0.72rem;
         color: var(--text-dim);
         line-height: 1.45;
         flex-grow: 1;
       }
-      .day-details strong {
-        color: var(--text);
+      .detail-panel {
+        background: var(--bg-detail);
+        border: 1px solid var(--border-active);
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-top: 0.75rem;
+        animation: slideDown 0.2s ease-out;
       }
-
-      .day-zwift-alt {
-        font-size: 0.65rem;
-        color: var(--text-dim);
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 3px;
-        padding: 0.35rem 0.45rem;
-        margin-top: auto;
-        line-height: 1.4;
-        border-left: 2px solid var(--border);
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
-      .day-zwift-alt .alt-label {
+      .detail-panel h3 {
         font-family: var(--font-mono);
-        font-size: 0.55rem;
+        font-size: 0.85rem;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      @media (max-width: 768px) {
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .detail-section {
+        margin-bottom: 0.75rem;
+      }
+      .detail-section:last-child {
+        margin-bottom: 0;
+      }
+      .detail-label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
         color: var(--text-dim);
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        margin-bottom: 0.3rem;
       }
-
-      /* ── Volume Chart ─────────────────────── */
+      .detail-text {
+        font-size: 0.78rem;
+        color: var(--text);
+        line-height: 1.55;
+      }
+      .detail-text strong {
+        color: var(--text-bright);
+      }
+      .detail-text em {
+        color: var(--accent);
+        font-style: normal;
+      }
+      .detail-tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 3px;
+        margin-right: 0.35rem;
+        margin-bottom: 0.25rem;
+      }
+      .tag-erg-on {
+        background: rgba(249, 115, 22, 0.15);
+        color: var(--zwift);
+      }
+      .tag-erg-off {
+        background: rgba(100, 116, 139, 0.2);
+        color: var(--z1);
+      }
+      .tag-hill-repeats {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--mtb);
+      }
+      .tag-low-cadence {
+        background: rgba(56, 189, 248, 0.12);
+        color: var(--z2);
+      }
+      .tag-race {
+        background: rgba(251, 191, 36, 0.15);
+        color: var(--race-gold);
+      }
+      .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.72rem;
+        margin-top: 0.5rem;
+      }
+      .detail-table th {
+        text-align: left;
+        padding: 0.4rem 0.5rem;
+        background: var(--bg-surface);
+        color: var(--text-dim);
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid var(--border);
+      }
+      .detail-table td {
+        padding: 0.4rem 0.5rem;
+        border-bottom: 1px solid var(--border);
+        color: var(--text);
+      }
+      .detail-table tr:last-child td {
+        border-bottom: none;
+      }
+      .detail-table .dim {
+        color: var(--text-dim);
+        font-size: 0.68rem;
+      }
+      .detail-intervals {
+        list-style: none;
+        padding: 0;
+      }
+      .detail-intervals li {
+        font-size: 0.75rem;
+        padding: 0.25rem 0;
+        color: var(--text);
+        display: flex;
+        gap: 0.5rem;
+      }
+      .detail-intervals li::before {
+        content: "›";
+        color: var(--accent-dim);
+        font-weight: 600;
+      }
       .chart-wrap {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -356,8 +457,6 @@
         width: 100%;
         height: 180px;
       }
-
-      /* ── Library Page ──────────────────────── */
       .lib-section {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -433,8 +532,6 @@
       .lib-note strong {
         color: var(--text);
       }
-
-      /* ── Recovery Protocol ─────────────────── */
       .protocol-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -462,8 +559,6 @@
         min-width: 5.5rem;
         flex-shrink: 0;
       }
-
-      /* ── Scrollbar ─────────────────────────── */
       ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -475,9 +570,6 @@
         background: var(--border);
         border-radius: 3px;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: var(--border-light);
-      }
     </style>
   </head>
   <body>
@@ -488,12 +580,11 @@
           <span>13-Week Training Plan</span>
         </div>
         <div class="header-meta">
-          <span>Race <strong>May 23–29</strong></span>
-          <span>Kickr Core 2 + Zwift</span>
+          <span>Race <strong>May 23–29</strong></span
+          ><span>Kickr Core 2 + Zwift</span>
         </div>
       </div>
     </header>
-
     <div class="tab-bar">
       <div class="tab-bar-inner">
         <button class="tab-btn active" data-page="schedule">Schedule</button>
@@ -502,9 +593,7 @@
         <button class="tab-btn" data-page="race">Race Protocol</button>
       </div>
     </div>
-
     <main>
-      <!-- ═══ SCHEDULE PAGE ═══ -->
       <div id="page-schedule" class="page active">
         <div class="chart-wrap">
           <h3>Weekly Volume (hours)</h3>
@@ -513,18 +602,15 @@
         <div id="week-strip" class="week-strip"></div>
         <div id="week-header-area"></div>
         <div id="week-content" class="day-grid"></div>
+        <div id="detail-area"></div>
       </div>
-
-      <!-- ═══ STRENGTH & CORE PAGE ═══ -->
       <div id="page-library" class="page">
         <details class="lib-section" open>
-          <summary>
-            Phase 3 Session A — Climbing Power & Unilateral Strength (Tue)
-          </summary>
+          <summary>Phase 3 Session A — Climbing Power (Tue)</summary>
           <div class="lib-body">
             <p class="lib-note">
-              <strong>Protocol:</strong> 3 sets × 3–6 reps. Heavy (80–95% 1RM).
-              Rest 2–4 min. Farmer's carries at end.
+              <strong>Protocol:</strong> 3×3–6 reps. Heavy (80–95% 1RM). Rest
+              2–4 min.
             </p>
             <table class="lib-table">
               <thead>
@@ -545,13 +631,11 @@
                   <td class="why-col">Max leg force for climbing</td>
                 </tr>
                 <tr>
-                  <td>Deadlift (or Trap Bar)</td>
+                  <td>Deadlift (Trap Bar)</td>
                   <td>3</td>
                   <td>3–6</td>
                   <td>Heavy</td>
-                  <td class="why-col">
-                    Posterior chain power, hip extension for pedaling
-                  </td>
+                  <td class="why-col">Posterior chain, hip extension</td>
                 </tr>
                 <tr>
                   <td>Pull-up / Lat Pulldown</td>
@@ -568,8 +652,7 @@
                   <td>3–6/leg</td>
                   <td>Heavy</td>
                   <td class="why-col">
-                    Unilateral strength — MTB is a single-leg sport. Protects
-                    against asymmetry over 7 race days
+                    Unilateral strength, protects against asymmetry
                   </td>
                 </tr>
                 <tr>
@@ -577,24 +660,18 @@
                   <td>3</td>
                   <td>40–60s</td>
                   <td>Heavy</td>
-                  <td class="why-col">
-                    Grip endurance, anti-lateral core, shoulder stabilization.
-                    Grip fatigue limits descending by Day 5+
-                  </td>
+                  <td class="why-col">Grip endurance, anti-lateral core</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </details>
-
         <details class="lib-section">
-          <summary>
-            Phase 3 Session B — Descending Resilience & Grip (Fri)
-          </summary>
+          <summary>Phase 3 Session B — Descending Resilience (Fri)</summary>
           <div class="lib-body">
             <p class="lib-note">
-              <strong>Protocol:</strong> 3 sets × 3–6 reps. Heavy. Rest 2–4 min.
-              Wrist roller at end. Core routine follows.
+              <strong>Protocol:</strong> 3×3–6 reps. Heavy. Rest 2–4 min. Core
+              follows.
             </p>
             <table class="lib-table">
               <thead>
@@ -612,37 +689,29 @@
                   <td>3</td>
                   <td>3–6</td>
                   <td>Heavy</td>
-                  <td class="why-col">
-                    Foundational — repeated from Session A
-                  </td>
+                  <td class="why-col">Foundational</td>
                 </tr>
                 <tr>
-                  <td>Deadlift (or Trap Bar)</td>
+                  <td>Deadlift (Trap Bar)</td>
                   <td>3</td>
                   <td>3–6</td>
                   <td>Heavy</td>
-                  <td class="why-col">
-                    Posterior chain — repeated from Session A
-                  </td>
+                  <td class="why-col">Posterior chain</td>
                 </tr>
                 <tr>
-                  <td>Bent-over Row / Heavy DB Row</td>
+                  <td>Bent-over Row / DB Row</td>
                   <td>3</td>
                   <td>3–6</td>
                   <td>Heavy</td>
-                  <td class="why-col">
-                    BCBR upper body demand is pulling: holding bars, absorbing
-                    impacts, climbing
-                  </td>
+                  <td class="why-col">Pulling for bar control and impacts</td>
                 </tr>
                 <tr>
                   <td>Eccentric Step-down</td>
                   <td>3</td>
                   <td>8/leg</td>
-                  <td>Moderate</td>
+                  <td>Mod</td>
                   <td class="why-col">
-                    3–4s lowering off step. Eccentric quad strength for
-                    absorbing descent impacts. Prevents Day 5 jelly legs
+                    3–4s lowering. Eccentric quads for descents
                   </td>
                 </tr>
                 <tr>
@@ -653,26 +722,24 @@
                   <td class="why-col">Grip and core endurance</td>
                 </tr>
                 <tr>
-                  <td>Wrist Roller / Wrist Ext. Curls</td>
+                  <td>Wrist Roller</td>
                   <td>2–3</td>
-                  <td>Roll up/down</td>
+                  <td>Roll</td>
                   <td>Light</td>
                   <td class="why-col">
-                    Forearm extensors — prevents forearm pump and loss of brake
-                    control on tech descents
+                    Prevents forearm pump on tech descents
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </details>
-
         <details class="lib-section">
-          <summary>Phase 4 — Taper Maintenance (Weeks 10–13, 1×/week)</summary>
+          <summary>Phase 4 — Taper Maintenance (Wk 10–13)</summary>
           <div class="lib-body">
             <p class="lib-note">
-              <strong>Protocol:</strong> 2 sets × 3–5 reps. Heavy but not to
-              failure (~80% 1RM). Minimum effective dose.
+              <strong>Protocol:</strong> 2×3–5 reps. Heavy, not to failure (~80%
+              1RM).
             </p>
             <table class="lib-table">
               <thead>
@@ -686,35 +753,32 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>Goblet Squat / Barbell Squat</td>
+                  <td>Goblet/Barbell Squat</td>
                   <td>2</td>
                   <td>3–5</td>
                   <td>Heavy</td>
-                  <td class="why-col">Leg activation without CNS fatigue</td>
+                  <td class="why-col">Leg activation</td>
                 </tr>
                 <tr>
                   <td>Dive Bomber Push-up</td>
                   <td>2</td>
                   <td>5–8</td>
                   <td>BW</td>
-                  <td class="why-col">
-                    Full shoulder range — mimics climbing/descending position
-                    transitions
-                  </td>
+                  <td class="why-col">Shoulder range for climb/descend</td>
                 </tr>
                 <tr>
                   <td>Dumbbell Row</td>
                   <td>2</td>
                   <td>3–5</td>
                   <td>Heavy</td>
-                  <td class="why-col">Pulling strength maintenance</td>
+                  <td class="why-col">Pulling maintenance</td>
                 </tr>
                 <tr>
                   <td>Farmer's Carry</td>
                   <td>2</td>
                   <td>30–40s</td>
                   <td>Heavy</td>
-                  <td class="why-col">Shortened grip maintenance</td>
+                  <td class="why-col">Grip maintenance</td>
                 </tr>
                 <tr>
                   <td>Plank</td>
@@ -727,77 +791,15 @@
             </table>
           </div>
         </details>
-
         <details class="lib-section">
-          <summary>Core Routine A — Anti-Rotation & Coordination</summary>
+          <summary>Core A — Anti-Rotation & Coordination</summary>
           <div class="lib-body">
-            <p class="lib-note">
-              Perform as circuit. ~10–12 min. Alternate with Routine B across
-              the week.
-            </p>
+            <p class="lib-note">Circuit ~10–12 min. Alternate with B.</p>
             <table class="lib-table">
               <thead>
                 <tr>
                   <th>Exercise</th>
-                  <th>Reps / Duration</th>
-                  <th class="why-col">Why</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Plank</td>
-                  <td>60s</td>
-                  <td class="why-col">
-                    Anti-extension baseline — rigid torso while pedaling
-                  </td>
-                </tr>
-                <tr>
-                  <td>Copenhagen Plank (L/R)</td>
-                  <td>20–30s/side</td>
-                  <td class="why-col">
-                    Adductor loading for saddle stability and lateral force
-                    absorption
-                  </td>
-                </tr>
-                <tr>
-                  <td>Dead Bug</td>
-                  <td>8–10/side (slow)</td>
-                  <td class="why-col">
-                    Contralateral coordination — mirrors pedaling + bike control
-                    demands
-                  </td>
-                </tr>
-                <tr>
-                  <td>Pallof Press (L/R)</td>
-                  <td>10/side, 2s hold</td>
-                  <td class="why-col">
-                    Anti-rotation — resisting lateral forces on singletrack
-                  </td>
-                </tr>
-                <tr>
-                  <td>Single-Leg Glute Bridge</td>
-                  <td>10/side</td>
-                  <td class="why-col">
-                    Pelvic stability under single-leg load, mirrors pedaling
-                    pattern
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </details>
-
-        <details class="lib-section">
-          <summary>Core Routine B — Dynamic Stability & Mobility</summary>
-          <div class="lib-body">
-            <p class="lib-note">
-              Perform as circuit. ~10–12 min. Alternate with Routine A.
-            </p>
-            <table class="lib-table">
-              <thead>
-                <tr>
-                  <th>Exercise</th>
-                  <th>Reps / Duration</th>
+                  <th>Reps</th>
                   <th class="why-col">Why</th>
                 </tr>
               </thead>
@@ -808,42 +810,72 @@
                   <td class="why-col">Anti-extension baseline</td>
                 </tr>
                 <tr>
-                  <td>Side Plank + Top Leg Lift (L/R)</td>
-                  <td>8–10 lifts/side</td>
-                  <td class="why-col">
-                    Glute medius — bike control through off-camber and corners
-                  </td>
+                  <td>Copenhagen Plank (L/R)</td>
+                  <td>20–30s/side</td>
+                  <td class="why-col">Adductor loading, saddle stability</td>
                 </tr>
                 <tr>
-                  <td>Dive Bomber Push-up</td>
-                  <td>5–8 (slow)</td>
-                  <td class="why-col">
-                    Full shoulder range under load — climbing ↔ descending
-                    transitions
-                  </td>
+                  <td>Dead Bug</td>
+                  <td>8–10/side</td>
+                  <td class="why-col">Contralateral coordination</td>
                 </tr>
                 <tr>
                   <td>Pallof Press (L/R)</td>
                   <td>10/side, 2s hold</td>
-                  <td class="why-col">
-                    Anti-rotation — important enough for both routines
-                  </td>
+                  <td class="why-col">Anti-rotation for singletrack</td>
                 </tr>
                 <tr>
-                  <td>Hip Flexor Stretch + Rotation (L/R)</td>
+                  <td>Single-Leg Glute Bridge</td>
+                  <td>10/side</td>
+                  <td class="why-col">Pelvic stability</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details class="lib-section">
+          <summary>Core B — Dynamic Stability & Mobility</summary>
+          <div class="lib-body">
+            <p class="lib-note">Circuit ~10–12 min. Alternate with A.</p>
+            <table class="lib-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Reps</th>
+                  <th class="why-col">Why</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Plank</td>
+                  <td>60s</td>
+                  <td class="why-col">Anti-extension</td>
+                </tr>
+                <tr>
+                  <td>Side Plank + Leg Lift (L/R)</td>
+                  <td>8–10/side</td>
+                  <td class="why-col">Glute medius for cornering</td>
+                </tr>
+                <tr>
+                  <td>Dive Bomber Push-up</td>
+                  <td>5–8 slow</td>
+                  <td class="why-col">Shoulder range under load</td>
+                </tr>
+                <tr>
+                  <td>Pallof Press (L/R)</td>
+                  <td>10/side, 2s hold</td>
+                  <td class="why-col">Anti-rotation</td>
+                </tr>
+                <tr>
+                  <td>Hip Flexor Stretch + Rot</td>
                   <td>30s/side</td>
-                  <td class="why-col">
-                    Counteracts saddle-induced hip flexor tightness → back pain
-                    on Days 5–7
-                  </td>
+                  <td class="why-col">Counteracts saddle tightness</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </details>
       </div>
-
-      <!-- ═══ ZWIFT REFERENCE PAGE ═══ -->
       <div id="page-zwift" class="page">
         <details class="lib-section" open>
           <summary>Zwift Workout Quick Reference</summary>
@@ -852,40 +884,40 @@
               <thead>
                 <tr>
                   <th>Goal</th>
-                  <th>Zwift Workout</th>
+                  <th>Workout</th>
                   <th>Collection</th>
-                  <th>Weeks</th>
+                  <th>Wks</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Sweet Spot (88–93% FTP)</td>
+                  <td>Sweet Spot (88–93%)</td>
                   <td>SST (Short)</td>
                   <td>Sweet Spot</td>
                   <td>2–3</td>
                 </tr>
                 <tr>
-                  <td>Threshold (95–105% FTP)</td>
-                  <td>Over Unders · The Wringer · 2×20 FTP</td>
+                  <td>Threshold (95–105%)</td>
+                  <td>Over Unders · Wringer · 2×20</td>
                   <td>Threshold</td>
                   <td>3–8</td>
                 </tr>
                 <tr>
-                  <td>VO2 Max (110–120% FTP)</td>
+                  <td>VO2 Max (110–120%)</td>
                   <td>The Gorby · Tabata</td>
                   <td>HIIT</td>
                   <td>6–8</td>
                 </tr>
                 <tr>
                   <td>MTB-Specific</td>
-                  <td>Annika Langvad Series (Wkts 2, 4, 5)</td>
+                  <td>Langvad (Wkts 2, 4, 5)</td>
                   <td>Mountain Bike</td>
                   <td>2–8</td>
                 </tr>
                 <tr>
-                  <td>Microbursts (15s on/off)</td>
+                  <td>Microbursts</td>
                   <td>Microbursts or custom</td>
-                  <td>HIIT / Custom</td>
+                  <td>HIIT/Custom</td>
                   <td>6–8</td>
                 </tr>
                 <tr>
@@ -896,25 +928,25 @@
                 </tr>
                 <tr>
                   <td>Climbing (ERG off)</td>
-                  <td>Alpe du Zwift · Road to Sky · Innsbruck KOM</td>
+                  <td>Alpe du Zwift · Road to Sky</td>
                   <td>Free ride</td>
-                  <td>Alt. Thu</td>
+                  <td>Alt Thu</td>
                 </tr>
                 <tr>
                   <td>Recovery</td>
-                  <td>Free ride Z1, flat route</td>
+                  <td>Free ride Z1, flat</td>
                   <td>Recovery</td>
-                  <td>Recov/taper</td>
+                  <td>Recov</td>
                 </tr>
                 <tr>
                   <td>Openers</td>
-                  <td>Emily's Short Mix or custom</td>
+                  <td>Emily's Short Mix / custom</td>
                   <td>Various</td>
                   <td>10–12</td>
                 </tr>
                 <tr>
-                  <td>Start Simulation</td>
-                  <td>Custom: 6–8×20s @ 200%+ FTP</td>
+                  <td>Start Sim</td>
+                  <td>Custom: 6–8×20s@200%+</td>
                   <td>Custom</td>
                   <td>6–8</td>
                 </tr>
@@ -922,88 +954,78 @@
             </table>
           </div>
         </details>
-
         <details class="lib-section">
           <summary>ERG Mode Guide</summary>
           <div class="lib-body">
             <p class="lib-note">
-              <strong>ERG ON:</strong> All structured intervals — threshold, VO2
-              max, sweet spot, microbursts. Trainer auto-adjusts resistance to
-              hold prescribed power.
+              <strong>ERG ON:</strong> Structured intervals — threshold, VO2
+              max, sweet spot, microbursts.
             </p>
             <p class="lib-note">
-              <strong>ERG OFF:</strong> Free rides, recovery spins, climbing
-              routes, and low-cadence torque work. You control effort via
-              gearing/cadence — closer to outdoor feel.
+              <strong>ERG OFF:</strong> Free rides, recovery, climbing routes,
+              low-cadence torque work.
             </p>
           </div>
         </details>
-
         <details class="lib-section">
           <summary>BCBR Zwift Club Schedule</summary>
           <div class="lib-body">
-            <p class="lib-note">
-              Group rides with BCBR racers. Can substitute for prescribed Z2
-              sessions.
-            </p>
             <table class="lib-table">
               <thead>
                 <tr>
                   <th>Day</th>
                   <th>Time (PT)</th>
                   <th>Type</th>
-                  <th>Duration</th>
+                  <th>Dur</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Sunday</td>
-                  <td>9:00 AM</td>
+                  <td>Sun</td>
+                  <td>9 AM</td>
                   <td>Endurance</td>
-                  <td>90 min</td>
+                  <td>90m</td>
                 </tr>
                 <tr>
-                  <td>Monday</td>
+                  <td>Mon</td>
                   <td>8:15 AM</td>
                   <td>Recovery</td>
-                  <td>90 min</td>
+                  <td>90m</td>
                 </tr>
                 <tr>
-                  <td>Wednesday</td>
-                  <td>6:30 / 10:30 AM / 5 PM</td>
+                  <td>Wed</td>
+                  <td>6:30/10:30 AM/5 PM</td>
                   <td>Endurance</td>
-                  <td>45–90 min</td>
+                  <td>45–90m</td>
                 </tr>
                 <tr>
-                  <td>Thursday</td>
-                  <td>11 AM / 5:30 PM</td>
+                  <td>Thu</td>
+                  <td>11 AM/5:30 PM</td>
                   <td>Race</td>
-                  <td>45 min</td>
+                  <td>45m</td>
                 </tr>
                 <tr>
-                  <td>Saturday</td>
-                  <td>9 AM / 4 PM</td>
+                  <td>Sat</td>
+                  <td>9 AM/4 PM</td>
                   <td>Endurance</td>
-                  <td>60 min</td>
+                  <td>60m</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </details>
-
         <details class="lib-section">
-          <summary>2025 BCBR Stage Data (Training Targets)</summary>
+          <summary>2025 BCBR Stage Data</summary>
           <div class="lib-body">
             <p class="lib-note">
-              Target elevation density: <strong>~155 ft/mi</strong>. Local
-              terrain is 100–115 ft/mi — use hill repeats to close gap.
+              Target: <strong>~155 ft/mi</strong>. Local ~100–115 ft/mi.
             </p>
             <table class="lib-table">
               <thead>
                 <tr>
                   <th>Stage</th>
                   <th>Location</th>
-                  <th>Distance</th>
+                  <th>Dist</th>
                   <th>Elev</th>
                   <th>ft/mi</th>
                 </tr>
@@ -1011,58 +1033,58 @@
               <tbody>
                 <tr>
                   <td>Prologue</td>
-                  <td>Maple Mountain</td>
-                  <td>~18 mi</td>
-                  <td>~2,700 ft</td>
+                  <td>Maple Mtn</td>
+                  <td>~18mi</td>
+                  <td>~2,700ft</td>
                   <td>~150</td>
                 </tr>
                 <tr>
-                  <td>Stage 2</td>
-                  <td>Cowichan Valley</td>
-                  <td>~21 mi</td>
-                  <td>~3,250 ft</td>
+                  <td>Stg 2</td>
+                  <td>Cowichan</td>
+                  <td>~21mi</td>
+                  <td>~3,250ft</td>
                   <td>~155</td>
                 </tr>
                 <tr>
-                  <td>Stage 3</td>
-                  <td>Mt. Tzouhalem</td>
-                  <td>~15.5 mi</td>
-                  <td>~3,250 ft</td>
+                  <td>Stg 3</td>
+                  <td>Tzouhalem</td>
+                  <td>~15.5mi</td>
+                  <td>~3,250ft</td>
                   <td>~210</td>
                 </tr>
                 <tr>
-                  <td>Stage 4</td>
+                  <td>Stg 4</td>
                   <td>Nanaimo</td>
-                  <td>~24.5 mi</td>
-                  <td>~3,050 ft</td>
+                  <td>~24.5mi</td>
+                  <td>~3,050ft</td>
                   <td>~125</td>
                 </tr>
                 <tr>
                   <td>Queen</td>
                   <td>Cumberland</td>
-                  <td>~24 mi</td>
-                  <td>~4,000 ft</td>
+                  <td>~24mi</td>
+                  <td>~4,000ft</td>
                   <td>~167</td>
                 </tr>
                 <tr>
-                  <td>Stage 6</td>
-                  <td>Campbell River</td>
-                  <td>~19 mi</td>
-                  <td>~2,930 ft</td>
+                  <td>Stg 6</td>
+                  <td>Campbell R</td>
+                  <td>~19mi</td>
+                  <td>~2,930ft</td>
                   <td>~154</td>
                 </tr>
                 <tr>
-                  <td>Stage 7</td>
+                  <td>Stg 7</td>
                   <td>Cumberland</td>
-                  <td>~19 mi</td>
-                  <td>~2,930 ft</td>
+                  <td>~19mi</td>
+                  <td>~2,930ft</td>
                   <td>~154</td>
                 </tr>
                 <tr>
                   <td><strong>Total</strong></td>
                   <td></td>
-                  <td><strong>~140 mi</strong></td>
-                  <td><strong>~22,100 ft</strong></td>
+                  <td><strong>~140mi</strong></td>
+                  <td><strong>~22,100ft</strong></td>
                   <td><strong>~155</strong></td>
                 </tr>
               </tbody>
@@ -1070,125 +1092,97 @@
           </div>
         </details>
       </div>
-
-      <!-- ═══ RACE PROTOCOL PAGE ═══ -->
       <div id="page-race" class="page">
         <div class="protocol-card">
           <h3>Daily Race / Recovery Protocol</h3>
-          <p class="lib-note" style="margin-bottom: 1rem">
-            Execute after every stage to maximize next-day performance.
-          </p>
           <div class="protocol-step">
-            <span class="time">0–5 min</span
-            ><span>Finish. Begin rehydrating immediately.</span>
+            <span class="time">0–5 min</span><span>Rehydrate immediately.</span>
           </div>
           <div class="protocol-step">
             <span class="time">5–20 min</span
-            ><span
-              >15-min cool-down spin on flat ground.
-              <strong>Must be Z1.</strong></span
-            >
+            ><span>15-min Z1 cooldown spin.</span>
           </div>
           <div class="protocol-step">
             <span class="time">20–30 min</span
-            ><span
-              >Recovery nutrition:
-              <strong>~30g protein + ~60g carbs.</strong></span
-            >
+            ><span><strong>~30g protein + ~60g carbs.</strong></span>
           </div>
           <div class="protocol-step">
             <span class="time">30–90 min</span
-            ><span
-              >Rehydrate, stretch, foam roll, clean up. Fix any
-              mechanicals.</span
-            >
+            ><span>Stretch, foam roll, fix mechanicals.</span>
           </div>
           <div class="protocol-step">
-            <span class="time">2+ hours</span
-            ><span
-              >Full balanced meal. Prep equipment for tomorrow.
-              <strong>Maximize sleep.</strong></span
-            >
+            <span class="time">2+ hrs</span
+            ><span>Full meal. Prep gear. <strong>Maximize sleep.</strong></span>
           </div>
         </div>
-
         <details class="lib-section" open>
-          <summary>Outdoor Pacing Metrics to Track</summary>
+          <summary>Pacing Metrics</summary>
           <div class="lib-body">
             <table class="lib-table">
               <thead>
                 <tr>
                   <th>Metric</th>
-                  <th>What It Tells You</th>
+                  <th>Purpose</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>VAM by zone (ft/hr climbing)</td>
-                  <td>
-                    Core race-pacing metric. Your sustainable Z2 VAM = your
-                    all-day pace.
-                  </td>
+                  <td>VAM by zone (ft/hr)</td>
+                  <td>Core race-pacing. Z2 VAM = all-day pace.</td>
                 </tr>
                 <tr>
-                  <td>Time per 1,000 ft at Z3/Z4</td>
+                  <td>Time/1,000ft at Z3/Z4</td>
                   <td>Race-pace climbing speed.</td>
                 </tr>
                 <tr>
-                  <td>Day 2 pace degradation</td>
-                  <td>
-                    Compare Sun VAM to Sat VAM at same zone. Gap should shrink
-                    over Build 2.
-                  </td>
+                  <td>Day 2 degradation</td>
+                  <td>Sun vs Sat VAM. Should shrink over Build 2.</td>
                 </tr>
                 <tr>
-                  <td>Avg speed at ~155 ft/mi</td>
-                  <td>Estimate BCBR stage finish times.</td>
+                  <td>Avg speed @155ft/mi</td>
+                  <td>Estimate stage finish times.</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </details>
-
         <details class="lib-section">
-          <summary>HR-Based Intensity Cues (No Power Meter)</summary>
+          <summary>HR Intensity Cues</summary>
           <div class="lib-body">
-            <p class="lib-note">
-              HR lags power by 20–30s. For intervals under 3 min, use RPE.
-            </p>
+            <p class="lib-note">HR lags 20–30s. Under 3 min use RPE.</p>
             <table class="lib-table">
               <thead>
                 <tr>
                   <th>Zone</th>
-                  <th>% LTHR</th>
+                  <th>%LTHR</th>
                   <th>Feel</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Z2 Endurance</td>
+                  <td>Z2</td>
                   <td>69–83%</td>
-                  <td>Conversational. Full sentences.</td>
+                  <td>Conversational</td>
                 </tr>
                 <tr>
-                  <td>Z3 Tempo</td>
+                  <td>Z3</td>
                   <td>84–94%</td>
-                  <td>Short sentences, prefer not to talk.</td>
+                  <td>Short sentences</td>
                 </tr>
                 <tr>
-                  <td>Z4 Threshold</td>
+                  <td>Z4</td>
                   <td>95–105%</td>
-                  <td>A few words at most. Labored breathing.</td>
+                  <td>Few words, labored</td>
                 </tr>
                 <tr>
-                  <td>Z5 VO2 Max</td>
+                  <td>Z5</td>
                   <td>>106%</td>
-                  <td>Cannot talk. Counting down the seconds.</td>
+                  <td>Cannot talk</td>
                 </tr>
                 <tr>
-                  <td>Z6 Anaerobic</td>
+                  <td>Z6</td>
                   <td>N/A</td>
-                  <td>Max effort, unsustainable beyond 30–60s.</td>
+                  <td>Max, <60s</td>
                 </tr>
               </tbody>
             </table>
@@ -1196,10 +1190,55 @@
         </details>
       </div>
     </main>
-
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        // ── Plan Data ──────────────────────────────────────────────────────────────────
+        const S3A = `<table class="detail-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Load</th></tr></thead><tbody><tr><td>Barbell Squat</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Deadlift</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Pull-up/Lat Pull</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Bulgarian Split Squat</td><td>3</td><td>3–6/leg</td><td>Heavy</td></tr><tr><td>Farmer's Carry</td><td>3</td><td>40–60s</td><td>Heavy</td></tr></tbody></table>`;
+        const S3B = `<table class="detail-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Load</th></tr></thead><tbody><tr><td>Barbell Squat</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Deadlift</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Bent-over Row</td><td>3</td><td>3–6</td><td>Heavy</td></tr><tr><td>Eccentric Step-down</td><td>3</td><td>8/leg</td><td>Mod</td></tr><tr><td>Farmer's Carry</td><td>2</td><td>40–60s</td><td>Heavy</td></tr><tr><td>Wrist Roller</td><td>2–3</td><td>Roll</td><td>Light</td></tr></tbody></table>`;
+        const SP4 = `<table class="detail-table"><thead><tr><th>Exercise</th><th>Sets</th><th>Reps</th><th>Load</th></tr></thead><tbody><tr><td>Goblet Squat</td><td>2</td><td>3–5</td><td>Heavy</td></tr><tr><td>Dive Bomber Push-up</td><td>2</td><td>5–8</td><td>BW</td></tr><tr><td>DB Row</td><td>2</td><td>3–5</td><td>Heavy</td></tr><tr><td>Farmer's Carry</td><td>2</td><td>30–40s</td><td>Heavy</td></tr><tr><td>Plank</td><td>2</td><td>60s</td><td>BW</td></tr></tbody></table>`;
+        const CA = `<table class="detail-table"><thead><tr><th>Exercise</th><th>Reps</th></tr></thead><tbody><tr><td>Plank</td><td>60s</td></tr><tr><td>Copenhagen Plank</td><td>20–30s/side</td></tr><tr><td>Dead Bug</td><td>8–10/side</td></tr><tr><td>Pallof Press</td><td>10/side, 2s</td></tr><tr><td>SL Glute Bridge</td><td>10/side</td></tr></tbody></table>`;
+        const CB = `<table class="detail-table"><thead><tr><th>Exercise</th><th>Reps</th></tr></thead><tbody><tr><td>Plank</td><td>60s</td></tr><tr><td>Side Plank+Leg Lift</td><td>8–10/side</td></tr><tr><td>Dive Bomber Push-up</td><td>5–8</td></tr><tr><td>Pallof Press</td><td>10/side, 2s</td></tr><tr><td>Hip Flexor Stretch</td><td>30s/side</td></tr></tbody></table>`;
+        const RP = `<div class="detail-section"><div class="detail-label">Post-Stage Protocol</div><div class="detail-text"><strong>0–5m:</strong> Rehydrate. <strong>5–20m:</strong> Z1 cooldown spin. <strong>20–30m:</strong> ~30g protein+60g carbs. <strong>30–90m:</strong> Stretch, foam roll. <strong>2+h:</strong> Full meal, prep gear, maximize sleep.</div></div>`;
+        function zwiftDetail(goal, workout, erg, intervals, outdoorAlt, extra) {
+          let h = `<div class="detail-grid"><div><div class="detail-section"><div class="detail-label">Goal</div><div class="detail-text">${goal}</div></div>`;
+          if (intervals)
+            h += `<div class="detail-section"><div class="detail-label">Interval Structure</div><ul class="detail-intervals">${intervals.map((i) => `<li>${i}</li>`).join("")}</ul></div>`;
+          h += `</div><div><div class="detail-section"><div class="detail-label">Recommended Workout</div><div class="detail-text"><em>${workout}</em> <span class="detail-tag ${erg ? "tag-erg-on" : "tag-erg-off"}">${erg ? "ERG ON" : "ERG OFF"}</span></div></div>`;
+          if (outdoorAlt)
+            h += `<div class="detail-section"><div class="detail-label">Outdoor Alternative</div><div class="detail-text">${outdoorAlt}</div></div>`;
+          if (extra) h += extra;
+          return h + `</div></div>`;
+        }
+        function mtbDetail(
+          goal,
+          dist,
+          elev,
+          ftmi,
+          pacing,
+          climbStrategy,
+          rainAlt,
+          extra,
+        ) {
+          let h = `<div class="detail-grid"><div><div class="detail-section"><div class="detail-label">Goal</div><div class="detail-text">${goal}</div></div>`;
+          h += `<div class="detail-section"><div class="detail-label">Targets</div><div class="detail-text"><strong>Distance:</strong> ${dist}<br><strong>Elevation:</strong> ${elev}${ftmi ? ` (~${ftmi} ft/mi)` : ""}<br>${pacing}</div></div>`;
+          if (climbStrategy)
+            h += `<div class="detail-section"><div class="detail-label">Climbing Strategy</div><div class="detail-text"><span class="detail-tag tag-hill-repeats">HILL REPEATS</span> ${climbStrategy}</div></div>`;
+          h += `</div><div>`;
+          if (rainAlt)
+            h += `<div class="detail-section"><div class="detail-label">Rain Day Alternative</div><div class="detail-text">${rainAlt}</div></div>`;
+          if (extra) h += extra;
+          return h + `</div></div>`;
+        }
+        function strDetail(session, table, core) {
+          let h = `<div class="detail-section"><div class="detail-label">${session}</div></div>${table}`;
+          if (core)
+            h += `<div class="detail-section" style="margin-top:.75rem"><div class="detail-label">Core Routine (alternate A/B)</div>${core}</div>`;
+          return h;
+        }
+
+        const D = {
+          rest: `<div class="detail-section"><div class="detail-text">Full rest. Sleep 7–9 hours. Hydrate well.</div></div>`,
+        };
+
         const weeks = [
           {
             id: 1,
@@ -1215,7 +1254,7 @@
                 dur: "",
                 zone: "",
                 details: "Full rest day.",
-                alt: "",
+                exp: D.rest,
               },
               {
                 day: "Tue Mar 3",
@@ -1223,7 +1262,13 @@
                 dur: "0:45",
                 zone: "Z1",
                 details: "Recovery spin. Flat route, easy cadence.",
-                alt: "Free ride Z1. ERG off.",
+                exp: zwiftDetail(
+                  "Promote blood flow for recovery. No training stimulus.",
+                  "Free ride Z1, any flat route",
+                  false,
+                  null,
+                  "45 min very easy trail spin. No climbing efforts.",
+                ),
               },
               {
                 day: "Wed Mar 4",
@@ -1231,16 +1276,21 @@
                 dur: "1:00",
                 zone: "Z2",
                 details: "60-min endurance. Steady aerobic spin.",
-                alt: "Jon's Mix or BCBR Club Wed ride. | Outdoor: 60 min easy trail, Z2.",
+                exp: zwiftDetail(
+                  "Light aerobic maintenance. Conversational pace.",
+                  "Jon's Mix (Endurance) or BCBR Club Wed ride",
+                  true,
+                  null,
+                  "60 min easy trail ride, 8–10 mi, Z2 HR.",
+                ),
               },
               {
                 day: "Thu Mar 5",
                 type: "FTP Test",
                 dur: "0:45",
                 zone: "Max",
-                details:
-                  "ZWIFT RAMP TEST. New FTP baseline for all remaining weeks.",
-                alt: "Workouts > FTP Tests. Enter result in Zwift profile.",
+                details: "ZWIFT RAMP TEST. New FTP baseline.",
+                exp: `<div class="detail-section"><div class="detail-label">Why This Week</div><div class="detail-text">Peloton FTP won't transfer to Kickr Core 2. This test sets <strong>the single most important number</strong> for all remaining training.</div></div><div class="detail-section"><div class="detail-label">Protocol</div><ul class="detail-intervals"><li><strong>Workouts → FTP Tests → Ramp Test</strong></li><li>Resistance increases every minute until failure</li><li>Zwift calculates FTP as ~75% of best 1-min power</li><li>Accept result — auto-updates all zones</li><li>Record this number — retest after Week 4</li></ul></div><div class="detail-section"><div class="detail-label">Tips</div><div class="detail-text">Stay seated. 80–95 RPM. Don't stand too early. Fan + water ready.</div></div>`,
               },
               {
                 day: "Fri Mar 6",
@@ -1248,7 +1298,9 @@
                 dur: "0:45",
                 zone: "",
                 details: "Phase 3 Session A, 1–2 sets only. Light.",
-                alt: "",
+                exp:
+                  `<div class="detail-section"><div class="detail-label">Recovery Week</div><div class="detail-text">1–2 sets only (not full 3). Movement quality focus.</div></div>` +
+                  S3A,
               },
               {
                 day: "Sat Mar 7",
@@ -1256,7 +1308,15 @@
                 dur: "1:30",
                 zone: "Z2",
                 details: "Easy trail. 10–12 mi, ~1,200 ft. Flow and fun.",
-                alt: "Rain: 90 min Zwift Z2, flat. 3×5 min low-cadence.",
+                exp: mtbDetail(
+                  "Enjoy the trail. Recovery ride — no training targets.",
+                  "10–12 mi",
+                  "~1,200 ft",
+                  "",
+                  "Easy Z2 HR throughout.",
+                  null,
+                  '90 min Zwift Z2, flat route. <span class="detail-tag tag-erg-off">ERG OFF</span> Include <span class="detail-tag tag-low-cadence">LOW CADENCE</span> 3×5 min @ 55–60 RPM.',
+                ),
               },
               {
                 day: "Sun Mar 8",
@@ -1264,7 +1324,13 @@
                 dur: "1:00",
                 zone: "Z2",
                 details: "60-min endurance ride.",
-                alt: "BCBR Club Sunday ride. | Outdoor: 60 min easy trail.",
+                exp: zwiftDetail(
+                  "Last easy day before Build 1 starts Monday.",
+                  "Foundation or BCBR Club Sunday ride (9 AM PT)",
+                  true,
+                  null,
+                  "60 min easy trail ride.",
+                ),
               },
             ],
           },
@@ -1282,24 +1348,40 @@
                 dur: "",
                 zone: "",
                 details: "Full rest day.",
-                alt: "",
+                exp: D.rest,
               },
               {
                 day: "Tue Mar 10",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail(
+                  "Session A — Climbing Power & Unilateral Strength",
+                  S3A,
+                ),
               },
               {
                 day: "Wed Mar 11",
                 type: "Zwift",
                 dur: "1:15",
                 zone: "Z3/Z4",
-                details:
-                  "Sweet spot. 3×12 min @ 88–93% FTP, 5 min Z2 rest. +15 min WU/CD.",
-                alt: "SST (Short). ERG on. | Outdoor: 3× a 12–15 min climb at Z3–Z4 HR.",
+                details: "Sweet spot. 3×12 min @ 88–93% FTP.",
+                exp: zwiftDetail(
+                  "<strong>Sweet spot bridge.</strong> Smoother ramp before full Z4 next week. 88–93% FTP = top of Z3 / bottom of Z4.",
+                  "SST (Short) from Sweet Spot collection",
+                  true,
+                  [
+                    "15 min warmup @ Z2",
+                    "12 min @ 88–93% FTP",
+                    "5 min Z2 recovery",
+                    "12 min @ 88–93% FTP",
+                    "5 min Z2 recovery",
+                    "12 min @ 88–93% FTP",
+                    "10 min cooldown",
+                  ],
+                  "3× a 12–15 min climb at Z3–Z4 HR (84–94% LTHR). Descend to recover.",
+                ),
               },
               {
                 day: "Thu Mar 12",
@@ -1307,16 +1389,31 @@
                 dur: "1:30",
                 zone: "Z2",
                 details:
-                  "90-min Z2 endurance. Include 4×6 min low-cadence (55–60 RPM). ERG off.",
-                alt: "Foundation (~90 min). | Outdoor: 90 min trail, 1,500 ft, Z2. Big gear on steep.",
+                  "90-min Z2 endurance. 4×6 min low-cadence (55–60 RPM).",
+                exp: zwiftDetail(
+                  "<strong>Aerobic endurance + torque.</strong> Low-cadence blocks build high-torque pedaling for steep BCBR climbs on loose surfaces.",
+                  "Foundation (~90 min) from Endurance collection",
+                  false,
+                  [
+                    "Main ride at Z2 with normal cadence",
+                    "4 blocks of 6 min at 55–60 RPM, big gear, Z2–Z3 power",
+                    "5 min normal cadence between blocks",
+                    "Do blocks in middle of ride, not at start",
+                  ],
+                  "90 min trail ride, 12–15 mi, 1,500 ft, Z2 HR. Grind steep pitches in big gear — this IS the torque work.",
+                ),
               },
               {
                 day: "Fri Mar 13",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail(
+                  "Session B — Descending Resilience & Grip",
+                  S3B,
+                  CA,
+                ),
               },
               {
                 day: "Sat Mar 14",
@@ -1324,17 +1421,33 @@
                 dur: "4:00",
                 zone: "Z2/Z3",
                 details:
-                  "22–26 mi, 4,000 ft target. Hill repeats as needed. 3×20 min Z3 on climbs. Track VAM.",
-                alt: "Rain: 3.5h Zwift. 3×20 min @ 88–93% FTP + 60 min Z2.",
+                  "22–26 mi, 4,000 ft. Hill repeats. 3×20 min Z3. Track VAM.",
+                exp: mtbDetail(
+                  "<strong>First race-simulation long ride.</strong> Track VAM at Z3 — this becomes your race pacing metric.",
+                  "22–26 mi",
+                  "4,000 ft",
+                  "155–180",
+                  "3×20 min at Z3 HR (84–94% LTHR) on climbs<br><strong>Track:</strong> VAM at Z3 (ft/hr climbing)",
+                  "Your terrain is ~100–115 ft/mi. To hit 4,000 ft: if best climb is 500 ft, that's 8 repeats. Vary intensity across repeats.",
+                  '<strong>3.5h Zwift</strong> (not shorter — durability matters). <span class="detail-tag tag-erg-on">ERG ON</span> for intervals.<br>20 min Z2 → 3×20 min @ 88–93% FTP (5 min rest) → 60 min Z2 → CD.',
+                  `<div class="detail-section"><div class="detail-label">Nutrition</div><div class="detail-text">Practice race-day fueling. 40–60g carbs/hour after first hour.</div></div>`,
+                ),
               },
               {
                 day: "Sun Mar 15",
                 type: "MTB",
                 dur: "2:00",
                 zone: "Z2",
-                details:
-                  "12–15 mi, 2,000 ft. Z2 recovery. Compare VAM to Saturday.",
-                alt: "Rain: 2h Zwift Z2 + 3×5 min low-cadence. ERG off.",
+                details: "12–15 mi, 2,000 ft. Z2 recovery. Compare VAM to Sat.",
+                exp: mtbDetail(
+                  '<strong>First "Day 2" simulation.</strong> Compare Z2 VAM today to yesterday. How much did you slow down?',
+                  "12–15 mi",
+                  "~2,000 ft",
+                  "",
+                  "Strict Z2 HR. Do not push into Z3.",
+                  null,
+                  '2h Zwift Z2 free ride. <span class="detail-tag tag-erg-off">ERG OFF</span> Include 3×5 min low-cadence. Duration matters.',
+                ),
               },
             ],
           },
@@ -1352,58 +1465,79 @@
                 dur: "",
                 zone: "",
                 details: "Full rest day.",
-                alt: "",
+                exp: D.rest,
               },
               {
                 day: "Tue Mar 17",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail("Session A — Climbing Power", S3A),
               },
               {
                 day: "Wed Mar 18",
                 type: "Zwift",
                 dur: "1:15",
                 zone: "Z4",
-                details:
-                  "Threshold. 3×10 min @ 95–100% FTP, 5 min Z2 rest. +15 min WU/CD.",
-                alt: "Over Unders or McCarthy Special. ERG on. | Outdoor: 3× 10–12 min climb at Z4 HR.",
+                details: "Threshold. 3×10 min @ 95–100% FTP.",
+                exp: zwiftDetail(
+                  '<strong>First true threshold session.</strong> Up from sweet spot to 95–100% FTP. "Comfortably uncomfortable."',
+                  "Over Unders or McCarthy Special (Threshold)",
+                  true,
+                  [
+                    "15 min warmup",
+                    "3× (10 min @ 95–100% FTP + 5 min Z2)",
+                    "10 min cooldown",
+                  ],
+                  '3× a 10–12 min climb at Z4 HR. Descend to recover. RPE: "Few words, labored breathing."',
+                ),
               },
               {
                 day: "Thu Mar 19",
                 type: "Zwift",
                 dur: "1:30",
                 zone: "Z3",
-                details:
-                  "CLIMBING DAY. 90 min Alpe du Zwift or Road to Sky. ERG OFF. Z3 effort.",
-                alt: "Outdoor: 90 min hilliest route. Sustained Z3 on all climbs.",
+                details: "CLIMBING DAY. Alpe du Zwift / Road to Sky. ERG OFF.",
+                exp: zwiftDetail(
+                  "<strong>Gradient-specific climbing.</strong> ERG off = Kickr simulates real gradients. Trains gear selection + pacing on sustained climbs.",
+                  "Alpe du Zwift (Road to Sky route) or Innsbruck KOM",
+                  false,
+                  null,
+                  "90 min trail ride, 15–18 mi. Hilliest route. Sustained Z3 on all climbs.",
+                ),
               },
               {
                 day: "Fri Mar 20",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail("Session B — Descending Resilience", S3B, CB),
               },
               {
                 day: "Sat Mar 21",
                 type: "MTB",
                 dur: "4:00",
                 zone: "Z2/Z3",
-                details:
-                  "22–26 mi, 4,000 ft. Hill repeats. 2×30 min Z3 on climbs.",
-                alt: "Rain: 3.5h Zwift. 2×30 min @ 88–93% FTP + 60 min Z2.",
+                details: "22–26 mi, 4,000 ft. 2×30 min Z3 on climbs.",
+                exp: mtbDetail(
+                  "Extend Z3 from 3×20 → 2×30 min. Longer sustained tempo = more muscular endurance.",
+                  "22–26 mi",
+                  "4,000 ft",
+                  "",
+                  "2×30 min at Z3 HR on climbs",
+                  "Same hill repeat strategy as last week.",
+                  '3.5h Zwift. 2×30 min @ 88–93% FTP (8 min rest) + 60 min Z2. <span class="detail-tag tag-erg-on">ERG ON</span>',
+                ),
               },
               {
                 day: "Sun Mar 22",
                 type: "MTB",
                 dur: "2:00",
                 zone: "Z2",
-                details: "12–15 mi, 2,000 ft. Z2 recovery ride.",
-                alt: "Rain: 2h Zwift Z2 + low-cadence blocks.",
+                details: "12–15 mi, 2,000 ft. Z2 recovery.",
+                exp: `<div class="detail-section"><div class="detail-text">Day 2 sim. Compare Z2 VAM to Saturday. Is degradation less than Week 2? Track this trend. Rain: 2h Zwift Z2 + low-cadence. <span class="detail-tag tag-erg-off">ERG OFF</span></div></div>`,
               },
             ],
           },
@@ -1421,58 +1555,84 @@
                 dur: "",
                 zone: "",
                 details: "Full rest day.",
-                alt: "",
+                exp: `<div class="detail-section"><div class="detail-text">Peak Build 1 week. Longest Saturday ride + first Z4 outdoor intervals.</div></div>`,
               },
               {
                 day: "Tue Mar 24",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail("Session A — Climbing Power", S3A),
               },
               {
                 day: "Wed Mar 25",
                 type: "Zwift",
                 dur: "1:15",
                 zone: "Z4",
-                details:
-                  "Threshold. 2×15 min @ 95–105% FTP, 8 min Z2 rest. +15 min WU/CD.",
-                alt: "The Wringer or Langvad Wkt 5. ERG on. | Outdoor: 2× longest climb at Z4 HR.",
+                details: "Threshold. 2×15 min @ 95–105% FTP.",
+                exp: zwiftDetail(
+                  "<strong>Peak Build 1 intensity.</strong> Longest sustained threshold intervals of this phase.",
+                  "The Wringer (Threshold) or Langvad Workout 5 (MTB)",
+                  true,
+                  [
+                    "15 min warmup",
+                    "15 min @ 95–105% FTP",
+                    "8 min Z2 recovery",
+                    "15 min @ 95–105% FTP",
+                    "10 min cooldown",
+                  ],
+                  "2× your longest sustained climb at Z4 HR. Full descent recovery between.",
+                ),
               },
               {
                 day: "Thu Mar 26",
                 type: "Zwift",
                 dur: "1:30",
                 zone: "Z2",
-                details:
-                  "90-min Z2 endurance. 4×6 min low-cadence (55–60 RPM). ERG off.",
-                alt: "Foundation ~90 min. | Outdoor: 90 min trail, 1,500 ft, Z2.",
+                details: "90-min Z2. 4×6 min low-cadence. ERG off.",
+                exp: zwiftDetail(
+                  "Z2 endurance + torque work. Same protocol as Week 2 Thursday.",
+                  "Foundation (~90 min)",
+                  false,
+                  [
+                    "4×6 min at 55–60 RPM in big gear, Z2–Z3 power",
+                    "5 min normal cadence recovery between",
+                  ],
+                  "90 min trail ride, 12–15 mi, 1,500 ft, Z2 HR.",
+                ),
               },
               {
                 day: "Fri Mar 27",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail("Session B + Core A", S3B, CA),
               },
               {
                 day: "Sat Mar 28",
                 type: "MTB",
                 dur: "4:30",
                 zone: "Z2/Z4",
-                details:
-                  "24–28 mi, 4,500 ft. Hill repeats. 3×15 min Z4. Note time per 1,000 ft at Z4.",
-                alt: "Rain: 3.5h Zwift. 3×15 min @ 95–105% FTP + 45 min Z2.",
+                details: "24–28 mi, 4,500 ft. 3×15 min Z4. Track time/1000ft.",
+                exp: mtbDetail(
+                  "<strong>First Z4 outdoor ride.</strong> Moving from Z3 tempo to Z4 threshold climbing. This is race-pace.",
+                  "24–28 mi",
+                  "4,500 ft",
+                  "160–185",
+                  "3×15 min at Z4 HR on climbs<br><strong>Track:</strong> Time per 1,000 ft at Z4 = race-pace climbing speed",
+                  "9+ repeats of a 500 ft climb. Alternate: 3@Z2, 3@Z4 (measured), 3@Z2/Z3.",
+                  '3.5h Zwift. 3×15 min @ 95–105% FTP + 45 min Z2. <span class="detail-tag tag-erg-on">ERG ON</span>',
+                ),
               },
               {
                 day: "Sun Mar 29",
                 type: "MTB",
                 dur: "2:00",
                 zone: "Z2",
-                details: "12–15 mi, 2,000 ft. Z2 recovery ride.",
-                alt: "Rain: 2h Zwift Z2 + low-cadence blocks.",
+                details: "12–15 mi, 2,000 ft. Z2 recovery.",
+                exp: `<div class="detail-section"><div class="detail-text">Z2 recovery. Track Day 2 pace degradation. End of Build 1 — recovery week next. Rain: 2h Zwift Z2.</div></div>`,
               },
             ],
           },
@@ -1489,8 +1649,8 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Recovery week. Absorb Build 1. Consider FTP retest Wed/Thu if you feel the number has moved significantly.</div></div>`,
               },
               {
                 day: "Tue Mar 31",
@@ -1498,54 +1658,56 @@
                 dur: "0:45",
                 zone: "Z1",
                 details: "Recovery spin.",
-                alt: "Free ride Z1. ERG off.",
+                exp: `<div class="detail-section"><div class="detail-text"><span class="detail-tag tag-erg-off">ERG OFF</span> Z1 only. Blood flow.</div></div>`,
               },
               {
                 day: "Wed Apr 1",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z2",
-                details: "60-min endurance ride.",
-                alt: "BCBR Club ride. | Outdoor: 60 min easy trail.",
+                details: "60-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">BCBR Club ride or Jon's Mix. Or optional FTP retest.</div></div>`,
               },
               {
                 day: "Thu Apr 2",
                 type: "Zwift",
                 dur: "0:30",
                 zone: "Z1",
-                details: "30-min recovery spin.",
-                alt: "Free ride Z1.",
+                details: "Recovery spin.",
+                exp: `<div class="detail-section"><div class="detail-text"><span class="detail-tag tag-erg-off">ERG OFF</span> Or rest completely.</div></div>`,
               },
               {
                 day: "Fri Apr 3",
                 type: "Strength",
                 dur: "0:30",
                 zone: "",
-                details: "Phase 3 Session A, 1–2 sets only. Light.",
-                alt: "",
+                details: "Phase 3 Session A, 1–2 sets. Light.",
+                exp:
+                  `<div class="detail-section"><div class="detail-text">Recovery: 1–2 sets only. Skip Session B this week.</div></div>` +
+                  S3A,
               },
               {
                 day: "Sat Apr 4",
                 type: "MTB",
                 dur: "1:30",
                 zone: "Z2",
-                details: "Easy trail ride. Fun and flow. 10–12 mi.",
-                alt: "Rain: 90 min Zwift Z2.",
+                details: "Easy trail. Fun and flow.",
+                exp: `<div class="detail-section"><div class="detail-text">No targets. Ride for enjoyment. Build 2 (hardest block) starts Monday.</div></div>`,
               },
               {
                 day: "Sun Apr 5",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z2",
-                details: "60-min endurance ride.",
-                alt: "BCBR Club ride. | Outdoor: 60 min easy trail.",
+                details: "60-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">Last easy day. BCBR Club ride or outdoor trail spin.</div></div>`,
               },
             ],
           },
           {
             id: 6,
             label: "Wk 6",
-            title: "Build 2 / Specialty, Week 1",
+            title: "Build 2, Week 1",
             dates: "Apr 6–12",
             phase: "Build 2",
             hours: 11.75,
@@ -1555,42 +1717,62 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Build 2 begins. VO2 max, microbursts, first Stage Race Sim weekend.</div></div>`,
               },
               {
                 day: "Tue Apr 7",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail("Session A — Climbing Power", S3A),
               },
               {
                 day: "Wed Apr 8",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z5",
-                details:
-                  "VO2 Max. 6×3 min @ 110–120% FTP, 3 min Z2 rest. +15 min WU/CD.",
-                alt: "The Gorby or Langvad Wkt 2. ERG on. | Outdoor: 6× steep 3–5 min hill repeats.",
+                details: "VO2 Max. 6×3 min @ 110–120% FTP.",
+                exp: zwiftDetail(
+                  '<strong>First VO2 max session.</strong> Shorter but much harder than threshold. Builds the "ceiling" so Z3/Z4 feel easier.',
+                  "The Gorby (HIIT, 8×3 min — do 6) or Langvad Workout 2 (MTB)",
+                  true,
+                  [
+                    "15 min warmup → progressive to Z3",
+                    "6× (3 min @ 110–120% FTP + 3 min Z2)",
+                    "10 min cooldown",
+                  ],
+                  'Hill repeats: 6× steep 3–5 min climb at max sustainable. RPE 6–7: "Cannot talk." Full descent recovery.',
+                ),
               },
               {
                 day: "Thu Apr 9",
                 type: "Zwift",
                 dur: "1:30",
                 zone: "Z2/Z5",
-                details:
-                  "MICROBURSTS. 20 min Z2 → 20 min 15s@150%/15s@55% → 10 min Z2 → 15 min bursts → 15 min CD.",
-                alt: "Custom workout or Microbursts. | Outdoor: Punchy loop trail, attack every rise.",
+                details: "MICROBURSTS. 15s@150% / 15s@55%, two blocks.",
+                exp: zwiftDetail(
+                  "<strong>Simulate punchy singletrack.</strong> BCBR = ~155 ft/mi of constant undulation. Every rise = surge, every flat = recovery. Microbursts train exactly this.",
+                  "Microbursts (HIIT) or custom workout",
+                  true,
+                  [
+                    "20 min Z2 warmup",
+                    "20 min: 15s@150% / 15s@55% FTP, continuous",
+                    "10 min Z2 recovery",
+                    "15 min: microbursts again",
+                    "15 min Z2 cooldown",
+                  ],
+                  "Looping trail with punchy features. Attack every short rise (15–20s max), recover on flats. 90 min.",
+                ),
               },
               {
                 day: "Fri Apr 10",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail("Session B + Core A", S3B, CA),
               },
               {
                 day: "Sat Apr 11",
@@ -1598,8 +1780,17 @@
                 dur: "4:00",
                 zone: "Sim",
                 details:
-                  "KITCHEN SINK. 22–26 mi, 4,000 ft. 3×15 min Z4, 4×3 min Z5. Tech skills 20–30 min at end.",
-                alt: "Rain: 3.5h Zwift. 2×15 min FTP + 4×3 min VO2 + 45 min Z2.",
+                  "KITCHEN SINK. 22–26 mi, 4,000 ft. 3×15m Z4, 4×3m Z5. Tech skills.",
+                exp: mtbDetail(
+                  "<strong>First Stage Race Sim.</strong> All intensities in one ride. End with 20–30 min tech skills while fatigued — this is what Days 5–7 of BCBR feel like.",
+                  "22–26 mi",
+                  "4,000 ft",
+                  "155–180",
+                  "3×15 min Z4 + 4×3 min Z5 on climbs<br>Final 20–30 min: technical skills under fatigue",
+                  "Vary intensity by repeat. If 500 ft climb: 2@Z2 warmup, 3@Z4, 2@Z5 (shorter efforts on steepest), 1@Z2 cooldown.",
+                  '<strong>3.5h Zwift.</strong> 2×15 min@FTP (8 min rest) → 4×3 min@110–115% (3 min rest) → 45 min Z2 → CD. <span class="detail-tag tag-erg-on">ERG ON</span> for intervals.',
+                  `<div class="detail-section"><div class="detail-label">Tech Skills Block</div><div class="detail-text">When fatigued at end: ride rocky/rooty sections you'd normally walk, practice remounting, eat/drink on technical terrain.</div></div>`,
+                ),
               },
               {
                 day: "Sun Apr 12",
@@ -1607,15 +1798,23 @@
                 dur: "3:00",
                 zone: "Z2/Z3",
                 details:
-                  "FATIGUED RIDE. 16–20 mi, 3,000 ft. Z2, push Z3 on climbs. Track pace degradation.",
-                alt: "Rain: 2.5h Zwift Z2/Z3 on tired legs.",
+                  "FATIGUED RIDE. 16–20 mi, 3,000 ft. Track pace degradation.",
+                exp: mtbDetail(
+                  "<strong>Ride on yesterday's tired legs.</strong> The adaptation = performing with fatigue, not fitness.",
+                  "16–20 mi",
+                  "3,000 ft",
+                  "",
+                  "Z2 base, push Z3 on climbs<br><strong>Track:</strong> Z2 and Z3 VAM vs yesterday",
+                  null,
+                  '2.5h Zwift Z2/Z3 on tired legs. 90 min Z2 + 2×15 min Z3 + low-cadence. <span class="detail-tag tag-erg-off">ERG OFF</span>',
+                ),
               },
             ],
           },
           {
             id: 7,
             label: "Wk 7",
-            title: "Build 2 / Specialty, Week 2",
+            title: "Build 2, Week 2",
             dates: "Apr 13–19",
             phase: "Build 2",
             hours: 13.0,
@@ -1625,51 +1824,74 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Volume increases. Sleep and nutrition critical.</div></div>`,
               },
               {
                 day: "Tue Apr 14",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail("Session A", S3A),
               },
               {
                 day: "Wed Apr 15",
                 type: "Zwift",
                 dur: "1:15",
                 zone: "Z4",
-                details:
-                  "Sustained threshold. 2×20 min @ 95–100% FTP, 10 min Z2 rest. +15 min WU/CD.",
-                alt: "2×20 FTP Intervals. ERG on. | Outdoor: 2× longest climb at Z4 HR.",
+                details: "Sustained threshold. 2×20 min @ 95–100% FTP.",
+                exp: zwiftDetail(
+                  "<strong>Classic 2×20.</strong> Gold standard FTP builder. 40 total minutes at threshold.",
+                  "2×20 FTP Intervals (Threshold collection)",
+                  true,
+                  [
+                    "15 min warmup",
+                    "20 min @ 95–100% FTP",
+                    "10 min Z2",
+                    "20 min @ 95–100% FTP",
+                    "10 min cooldown",
+                  ],
+                  "2× longest sustained climb (~20 min each) at Z4 HR.",
+                ),
               },
               {
                 day: "Thu Apr 16",
                 type: "Zwift",
                 dur: "1:30",
                 zone: "Z3",
-                details:
-                  "CLIMBING DAY. 90 min Alpe du Zwift / Innsbruck KOM. ERG OFF. Z3 effort.",
-                alt: "Outdoor: 90 min hilliest route. Sustained Z3.",
+                details: "CLIMBING DAY. Alpe du Zwift / Innsbruck. ERG OFF.",
+                exp: zwiftDetail(
+                  "Gradient-specific climbing. Practice sustained pacing against real resistance.",
+                  "Alpe du Zwift or Innsbruck KOM",
+                  false,
+                  null,
+                  "90 min hilliest route. Sustained Z3 on all climbs.",
+                ),
               },
               {
                 day: "Fri Apr 17",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail("Session B + Core B", S3B, CB),
               },
               {
                 day: "Sat Apr 18",
                 type: "Sim",
                 dur: "4:30",
                 zone: "Sim",
-                details:
-                  "KITCHEN SINK. 24–28 mi, 4,500 ft. 2×20 min Z4, 5×3 min Z5. Tech skills.",
-                alt: "Rain: 4h Zwift. 2×20 min FTP + 5×3 min VO2 + 60 min Z2.",
+                details: "KITCHEN SINK. 24–28 mi, 4,500 ft. 2×20m Z4, 5×3m Z5.",
+                exp: mtbDetail(
+                  "Volume up: 4h→4.5h, 4,000→4,500 ft. Z4 intervals lengthen. +1 Z5 repeat.",
+                  "24–28 mi",
+                  "4,500 ft",
+                  "160–185",
+                  "2×20 min Z4 + 5×3 min Z5<br>20–30 min tech skills when fatigued",
+                  "Hill repeats to hit target. Alternate intensity across repeats.",
+                  '4h Zwift. 2×20 min FTP (10 min rest) → 5×3 min@110–115% (3 min rest) → 60 min Z2. <span class="detail-tag tag-erg-on">ERG ON</span>',
+                ),
               },
               {
                 day: "Sun Apr 19",
@@ -1677,8 +1899,8 @@
                 dur: "3:30",
                 zone: "Z2/Z3",
                 details:
-                  "FATIGUED RIDE. 18–22 mi, 3,500 ft. Steady Z3. Practice race nutrition.",
-                alt: "Rain: 3h Zwift Z2/Z3 on tired legs.",
+                  "FATIGUED RIDE. 18–22 mi, 3,500 ft. Steady Z3. Race nutrition.",
+                exp: `<div class="detail-section"><div class="detail-text"><strong>Day 2 sim.</strong> Steady Z3 throughout. Practice race nutrition — eat every 20–30 min while riding at tempo. Rain: 3h Zwift Z2/Z3 on tired legs.</div></div>`,
               },
             ],
           },
@@ -1695,42 +1917,62 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest. Sleep is critical this week.",
-                alt: "",
+                details: "Full rest. Sleep is critical.",
+                exp: `<div class="detail-section"><div class="detail-label">⚠️ Peak Week</div><div class="detail-text"><strong>Hardest week of the plan.</strong> Saturday = longest, hardest ride. Sunday = Day 5 of BCBR. Prioritize 8+ hrs sleep, nutrition, hydration. If anything feels off (illness/injury), scale back. Do NOT push into overtraining.</div></div>`,
               },
               {
                 day: "Tue Apr 21",
                 type: "Strength",
                 dur: "1:00",
                 zone: "",
-                details: "Phase 3 Session A (Table 3a).",
-                alt: "",
+                details: "Phase 3 Session A.",
+                exp: strDetail("Session A", S3A),
               },
               {
                 day: "Wed Apr 22",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z5",
-                details:
-                  "VO2 Max. 5×4 min @ 106–120% FTP, 4 min Z2 rest. +15 min WU/CD.",
-                alt: "Tabata or Langvad Wkt 4. ERG on. | Outdoor: 5× 4–5 min steep hill repeats.",
+                details: "VO2 Max. 5×4 min @ 106–120% FTP.",
+                exp: zwiftDetail(
+                  "<strong>Peak VO2 max.</strong> Longer intervals than Wk 6 (4 min vs 3 min). Top of the fitness pyramid.",
+                  "Tabata (HIIT) or Langvad Workout 4 (MTB)",
+                  true,
+                  [
+                    "15 min warmup",
+                    "5× (4 min @ 106–120% FTP + 4 min Z2)",
+                    "10 min cooldown",
+                  ],
+                  "5× a 4–5 min steep climb at max sustainable effort. Full descent recovery.",
+                ),
               },
               {
                 day: "Thu Apr 23",
                 type: "Zwift",
                 dur: "1:30",
                 zone: "Z2/Z5",
-                details:
-                  "MICROBURSTS. 20 min Z2 → 20 min bursts → 10 min Z2 → 20 min bursts → 15 min CD. 5×8 min low-cadence in Z2.",
-                alt: "Custom workout. | Outdoor: Punchy trail, attack rises, 90 min.",
+                details: "MICROBURSTS + 5×8 min low-cadence in Z2 portions.",
+                exp: zwiftDetail(
+                  "Same microburst protocol as Wk 6, with added low-cadence blocks in Z2 recovery.",
+                  "Custom workout or Microbursts (HIIT)",
+                  true,
+                  [
+                    "20 min Z2 warmup",
+                    "20 min microbursts (15s@150%/15s@55%)",
+                    "10 min Z2 with low-cadence block",
+                    "20 min microbursts",
+                    "15 min Z2 cooldown with low-cadence",
+                  ],
+                  "Punchy trail, 90 min, attack every rise.",
+                ),
               },
               {
                 day: "Fri Apr 24",
                 type: "Strength",
                 dur: "1:15",
                 zone: "",
-                details: "Phase 3 Session B (Table 3b) + Core (alt 5a/5b).",
-                alt: "",
+                details: "Phase 3 Session B + Core.",
+                exp: strDetail("Session B + Core A", S3B, CA),
               },
               {
                 day: "Sat Apr 25",
@@ -1738,8 +1980,16 @@
                 dur: "5:00",
                 zone: "Sim",
                 details:
-                  "PEAK SIM. 26–30 mi, 5,000 ft. 2×20 min Z4, 4×4 min Z5. 30 min tech skills. HARDEST RIDE.",
-                alt: "Rain: 4h Zwift. 2×20 FTP + 4×4 VO2 + 60 min Z2. Mental fortitude.",
+                  "PEAK SIM. 26–30 mi, 5,000 ft. 2×20m Z4, 4×4m Z5. HARDEST RIDE.",
+                exp: mtbDetail(
+                  "<strong>⚠️ Hardest ride of the entire plan.</strong> Peak volume + intensity. After this, it only gets easier (recovery → taper → race).",
+                  "26–30 mi",
+                  "5,000 ft",
+                  "165–190",
+                  "2×20 min Z4 + 4×4 min Z5<br>30 min tech skills under fatigue",
+                  "10+ repeats. Full race-day nutrition: 40–60g carbs/hr. If nutrition fails here, fix before race day.",
+                  "<strong>4h Zwift.</strong> Mental fortitude day. 2×20 min FTP (10 min rest) → 4×4 min@110–120% (4 min rest) → 60 min Z2 → CD. Set up entertainment.",
+                ),
               },
               {
                 day: "Sun Apr 26",
@@ -1747,8 +1997,8 @@
                 dur: "4:00",
                 zone: "Z2/Z3",
                 details:
-                  "PEAK FATIGUED RIDE. 22–26 mi, 4,000 ft. Steady Z3. Legs = Day 5 of BCBR.",
-                alt: "Rain: 3.5h Zwift Z2/Z3 on tired legs.",
+                  "PEAK FATIGUED RIDE. 22–26 mi, 4,000 ft. Legs = Day 5 BCBR.",
+                exp: `<div class="detail-section"><div class="detail-text"><strong>Your legs should feel terrible. That's the point.</strong> Steady Z3 despite fatigue. Track pace degradation vs Saturday. This is the closest you'll get to BCBR Days 5–7 before the race. Rain: 3.5h Zwift Z2/Z3 on tired legs.</div></div>`,
               },
             ],
           },
@@ -1765,8 +2015,8 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Peak training done. Absorb fitness. Resist "one more hard session." It won't help.</div></div>`,
               },
               {
                 day: "Tue Apr 28",
@@ -1774,47 +2024,49 @@
                 dur: "0:45",
                 zone: "Z1",
                 details: "Recovery spin.",
-                alt: "Outdoor: 45 min very easy trail spin.",
+                exp: `<div class="detail-section"><div class="detail-text"><span class="detail-tag tag-erg-off">ERG OFF</span> Z1. Outdoor: 45 min easy trail.</div></div>`,
               },
               {
                 day: "Wed Apr 29",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z2",
-                details: "60-min endurance ride.",
-                alt: "BCBR Club ride. | Outdoor: 60 min Z2 trail.",
+                details: "60-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">BCBR Club ride or Jon's Mix.</div></div>`,
               },
               {
                 day: "Thu Apr 30",
                 type: "Zwift",
                 dur: "0:30",
                 zone: "Z1",
-                details: "30-min recovery spin.",
-                alt: "",
+                details: "Recovery spin.",
+                exp: `<div class="detail-section"><div class="detail-text"><span class="detail-tag tag-erg-off">ERG OFF</span> Or rest.</div></div>`,
               },
               {
                 day: "Fri May 1",
                 type: "Strength",
                 dur: "0:30",
                 zone: "",
-                details: "Phase 3 Session A, 1–2 sets only. Light.",
-                alt: "",
+                details: "Phase 3 Session A, 1–2 sets.",
+                exp:
+                  `<div class="detail-section"><div class="detail-text">Recovery: 1–2 sets. Last heavy strength before Phase 4 taper.</div></div>` +
+                  S3A,
               },
               {
                 day: "Sat May 2",
                 type: "MTB",
                 dur: "1:30",
                 zone: "Z2",
-                details: "Easy trail ride. 10–12 mi. Fun and flow.",
-                alt: "Rain: 90 min Zwift Z2.",
+                details: "Easy trail. Fun and flow.",
+                exp: `<div class="detail-section"><div class="detail-text">No targets. Mentally transition toward race execution.</div></div>`,
               },
               {
                 day: "Sun May 3",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z2",
-                details: "60-min endurance ride.",
-                alt: "BCBR Club ride. | Outdoor: 60 min Z2 trail.",
+                details: "60-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">Last day before taper begins.</div></div>`,
               },
             ],
           },
@@ -1831,34 +2083,50 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Taper 1. Volume ~20–25% of peak. You may feel restless — trust the process. Fitness is banked.</div></div>`,
               },
               {
                 day: "Tue May 5",
                 type: "Strength",
                 dur: "0:45",
                 zone: "",
-                details:
-                  "Phase 4 (Table 4). 2×3–5 reps. Heavy, not to failure.",
-                alt: "",
+                details: "Phase 4. 2×3–5 reps. Heavy, not to failure.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label">Phase 4 — Taper Maintenance</div><div class="detail-text">Minimum effective dose. Keep nervous system primed.</div></div>` +
+                  SP4,
               },
               {
                 day: "Wed May 6",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z4/Z5",
-                details:
-                  "Openers. 2×5 min @ 95–100% FTP + 2×2 min @ 110–115% FTP. Rest Z1.",
-                alt: "Emily's Short Mix. ERG on. | Outdoor: 60 min + Z4/Z5 efforts on climbs.",
+                details: "Openers. 2×5m@FTP + 2×2m@110–115%.",
+                exp: zwiftDetail(
+                  "<strong>Maintain sharpness.</strong> Short, crisp — not a fitness session. Should feel strong and fast.",
+                  "Emily's Short Mix or custom Taper Openers",
+                  true,
+                  [
+                    "15 min warmup",
+                    "5 min @ 95–100% FTP",
+                    "3 min Z1",
+                    "5 min @ 95–100% FTP",
+                    "3 min Z1",
+                    "2 min @ 110–115% FTP",
+                    "3 min Z1",
+                    "2 min @ 110–115% FTP",
+                    "10 min cooldown",
+                  ],
+                  "60 min ride + Z4/Z5 efforts on familiar climbs.",
+                ),
               },
               {
                 day: "Thu May 7",
                 type: "Zwift",
                 dur: "1:00",
                 zone: "Z2",
-                details: "60-min endurance ride.",
-                alt: "Outdoor: 60 min Z2 trail, 8–10 mi.",
+                details: "60-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">Easy Z2. Outdoor: 60 min Z2 trail, 8–10 mi.</div></div>`,
               },
               {
                 day: "Fri May 8",
@@ -1866,24 +2134,31 @@
                 dur: "",
                 zone: "",
                 details: "Full rest.",
-                alt: "",
+                exp: D.rest,
               },
               {
                 day: "Sat May 9",
                 type: "MTB",
                 dur: "3:00",
                 zone: "Sim",
-                details:
-                  "TAPER SIM. 16–20 mi, 3,000 ft. 2×10 min Z4, 2×3 min Z5. Controlled.",
-                alt: "Rain: 2h Zwift. 2×10 FTP + 2×3 VO2 + 30 min Z2.",
+                details: "TAPER SIM. 16–20 mi, 3,000 ft. 2×10m Z4, 2×3m Z5.",
+                exp: mtbDetail(
+                  "<strong>Sharpness, not fitness.</strong> If efforts feel sluggish = taper fatigue. Will resolve by race day.",
+                  "16–20 mi",
+                  "3,000 ft",
+                  "",
+                  "2×10 min Z4 + 2×3 min Z5<br>Stay controlled — not a peak effort.",
+                  null,
+                  '2h Zwift. 2×10 min FTP + 2×3 min@110% + 30 min Z2. <span class="detail-tag tag-erg-on">ERG ON</span>',
+                ),
               },
               {
                 day: "Sun May 10",
                 type: "MTB",
                 dur: "2:00",
                 zone: "Z2",
-                details: "12–15 mi, 2,000 ft. Z2 endurance.",
-                alt: "Rain: 90 min Zwift Z2.",
+                details: "12–15 mi, 2,000 ft. Z2.",
+                exp: `<div class="detail-section"><div class="detail-text">Easy Z2. Rain: 90 min Zwift Z2.</div></div>`,
               },
             ],
           },
@@ -1900,33 +2175,44 @@
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Full rest day.",
-                alt: "",
+                details: "Full rest.",
+                exp: `<div class="detail-section"><div class="detail-text">Taper 2. Volume 40–50% of peak. Feeling "flat" is normal and resolves before race day. Do NOT add sessions.</div></div>`,
               },
               {
                 day: "Tue May 12",
                 type: "Strength",
                 dur: "0:30",
                 zone: "",
-                details: "Phase 4 (Table 4). Last strength session.",
-                alt: "",
+                details: "Phase 4. Last strength session.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label">Final Strength Session</div><div class="detail-text">Last time in the gym. Activation only.</div></div>` +
+                  SP4,
               },
               {
                 day: "Wed May 13",
                 type: "Zwift",
                 dur: "0:45",
                 zone: "Z4",
-                details:
-                  "Openers. 3×3 min @ 95–100% FTP, rest Z1. +15 min WU/CD.",
-                alt: "Custom Openers. ERG on. | Outdoor: 45 min + 3×3 min Z4 on a climb.",
+                details: "Openers. 3×3 min @ 95–100% FTP.",
+                exp: zwiftDetail(
+                  "Short, sharp Z4 openers.",
+                  "Custom Openers workout",
+                  true,
+                  [
+                    "15 min warmup",
+                    "3× (3 min @ 95–100% FTP + 3 min Z1)",
+                    "10 min cooldown",
+                  ],
+                  "45 min + 3×3 min Z4 on a familiar climb.",
+                ),
               },
               {
                 day: "Thu May 14",
                 type: "Zwift",
                 dur: "0:45",
                 zone: "Z2",
-                details: "45-min endurance ride.",
-                alt: "Outdoor: 45 min easy trail.",
+                details: "45-min endurance.",
+                exp: `<div class="detail-section"><div class="detail-text">Easy Z2. Outdoor: 45 min easy trail.</div></div>`,
               },
               {
                 day: "Fri May 15",
@@ -1934,25 +2220,29 @@
                 dur: "",
                 zone: "",
                 details: "Full rest.",
-                alt: "",
+                exp: `<div class="detail-section"><div class="detail-text">Begin packing BCBR equipment if not done.</div></div>`,
               },
               {
                 day: "Sat May 16",
                 type: "MTB",
                 dur: "1:30",
                 zone: "Z2",
-                details:
-                  "Easy trail. 8–10 mi. Final bike check. Verify BCBR equipment.",
-                alt: "Rain: 60 min Zwift Z2. Ensure bike is packed.",
+                details: "Easy trail. 8–10 mi. Final bike check.",
+                exp: `<div class="detail-section"><div class="detail-label">⚠️ Final Equipment Check</div><div class="detail-text">Last outdoor ride before race. Verify: tires, brake pads, chain, derailleur, cockpit bolts, sealant. If anything needs replacing, do it <strong>today</strong>. Rain: 60 min Zwift Z2. Ensure bike is packed.</div></div>`,
               },
               {
                 day: "Sun May 17",
                 type: "Zwift",
                 dur: "0:45",
                 zone: "Z2/Z4",
-                details:
-                  "Openers. 45 min with 2×3 min @ 95–100% FTP. Last hard efforts.",
-                alt: "Outdoor: 45 min trail + 2×3 min Z4.",
+                details: "Openers. 2×3 min @ FTP. Last hard efforts.",
+                exp: zwiftDetail(
+                  "<strong>Final activation.</strong> Last hard pedal strokes before BCBR. Should feel sharp and ready.",
+                  "Custom: short Z2 ride with 2×3 min @ FTP",
+                  true,
+                  null,
+                  "45 min trail + 2×3 min Z4 on familiar climb.",
+                ),
               },
             ],
           },
@@ -1971,57 +2261,59 @@
                 dur: "",
                 zone: "",
                 details: "Travel day. Hydrate well.",
-                alt: "",
+                exp: `<div class="detail-section"><div class="detail-text">Travel to Vancouver Island. 3+ liters water. No alcohol. Pack snacks.</div></div>`,
               },
               {
                 day: "Tue May 19",
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Travel day. Hydrate, eat well, sleep.",
-                alt: "",
+                details: "Travel day.",
+                exp: `<div class="detail-section"><div class="detail-text">Continue hydrating. Short walk to move legs. Set up race nutrition tonight.</div></div>`,
               },
               {
                 day: "Wed May 20",
                 type: "MTB",
                 dur: "0:45",
                 zone: "Z1/Z2",
-                details:
-                  "Easy spin on-site. Shake out travel legs. Check bike.",
-                alt: "",
+                details: "Easy spin on-site. Check bike.",
+                exp: `<div class="detail-section"><div class="detail-text">Shake out travel legs. Reassemble bike — verify brakes, shifting, tire pressure. 30–45 min Z1/Z2 on flat ground. Familiarize with start area.</div></div>`,
               },
               {
                 day: "Thu May 21",
                 type: "MTB",
                 dur: "0:30",
                 zone: "Z1/Z4",
-                details:
-                  "30-min Z1 spin + 3×1 min Openers @ Z4. Final activation.",
-                alt: "",
+                details: "30-min Z1 + 3×1 min Openers @ Z4.",
+                exp: `<div class="detail-section"><div class="detail-text"><strong>Final activation.</strong> 25 min easy, then 3×1 min Z4 HR with 2 min Z1 between. Should feel easy and crisp. If sluggish → dehydration or under-recovery, address tonight.</div></div>`,
               },
               {
                 day: "Fri May 22",
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Final prep. Optional 20-min Z1 spin. Early to bed.",
-                alt: "",
+                details: "Final prep. Optional 20-min Z1 spin.",
+                exp: `<div class="detail-section"><div class="detail-text">Lay out everything: kit, shoes, helmet, glasses, nutrition, bottles, spares. Charge devices. Balanced dinner (nothing experimental). Early to bed.</div></div>`,
               },
               {
                 day: "Sat May 23",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details: "🏁 BCBR Day 1 — Cumberland. Execute nutrition plan.",
-                alt: "",
+                details: "🏁 BCBR Day 1 — Cumberland.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 1</span> Cumberland</div><div class="detail-text">2025 ref: ~24 mi, ~4,000 ft, ~167 ft/mi. Punchy, technical, non-stop. <strong>Do not go out too hard.</strong> Settle into Z3 within 10 minutes. You have 6 more days.</div></div>` +
+                  RP,
               },
               {
                 day: "Sun May 24",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details: "🏁 BCBR Day 2 — Campbell River. Recovery protocol.",
-                alt: "",
+                details: "🏁 BCBR Day 2 — Campbell River.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 2</span> Campbell River</div><div class="detail-text">2025 ref: ~19 mi, ~2,930 ft, ~154 ft/mi. Second-growth forest, remote lakes. Your legs will feel Day 1. Execute recovery protocol precisely tonight.</div></div>` +
+                  RP,
               },
             ],
           },
@@ -2040,101 +2332,105 @@
                 dur: "",
                 zone: "Race",
                 details: "🏁 BCBR Day 3 — Cumberland.",
-                alt: "",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 3</span> Cumberland (Stage 2)</div><div class="detail-text">Different flavor than Day 1 — 441 km of trails available. Fatigue building. Focus on nutrition timing and Z1 cooldown.</div></div>` +
+                  RP,
               },
               {
                 day: "Tue May 26",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details: "🏁 BCBR Day 4 — Parksville / Hammerfest. New venue.",
-                alt: "",
+                details: "🏁 BCBR Day 4 — Parksville / Hammerfest.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 4</span> Parksville (Hammerfest)</div><div class="detail-text"><strong>New venue for 2026.</strong> Unknown course = conservative early. Save for second half. Mid-race nutrition critical — past halfway of cumulative fatigue.</div></div>` +
+                  RP,
               },
               {
                 day: "Wed May 27",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details:
-                  "🏁 BCBR Day 5 — Mt. Tzouhalem. ~210 ft/mi. Manage fatigue.",
-                alt: "",
+                details: "🏁 BCBR Day 5 — Mt. Tzouhalem. ~210 ft/mi.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 5</span> Mt. Tzouhalem</div><div class="detail-text">2025: ~15.5 mi, ~3,250 ft, <strong>~210 ft/mi — highest density of the week.</strong> Short but punchy, 5 climbs. Rocks and roots. Your Peak Week fatigued ride training pays off here.</div></div>` +
+                  RP,
               },
               {
                 day: "Thu May 28",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details:
-                  "🏁 BCBR Day 6 — Nanaimo. Swim at Westwood Lake post-race.",
-                alt: "",
+                details: "🏁 BCBR Day 6 — Nanaimo.",
+                exp:
+                  `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 6</span> Nanaimo</div><div class="detail-text">2025: ~24.5 mi, ~3,050 ft, ~125 ft/mi. Lowest density but your legs are at their worst. Swim in Westwood Lake post-stage. Leave something for tomorrow.</div></div>` +
+                  RP,
               },
               {
                 day: "Fri May 29",
                 type: "Race",
                 dur: "",
                 zone: "Race",
-                details:
-                  "🏁 BCBR Day 7 — Maple Mountain. Victory lap. Leave it all.",
-                alt: "",
+                details: "🏁 BCBR Day 7 — Maple Mountain. Victory lap.",
+                exp: `<div class="detail-section"><div class="detail-label"><span class="detail-tag tag-race">DAY 7</span> Maple Mountain — Victory Lap</div><div class="detail-text">2025: ~19 mi, ~2,930 ft. <strong>Last stage. Leave everything on the trail.</strong> No fatigue management needed. Race your heart out. Gala dinner tonight. 🎉</div></div>`,
               },
               {
                 day: "Sat May 30",
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Congratulations. Begin recovery. Celebrate.",
-                alt: "",
+                details: "Congratulations. Celebrate.",
+                exp: `<div class="detail-section"><div class="detail-text" style="font-size:1rem;color:var(--accent)">🎉 7 days. ~140 miles. ~22,000 feet. You earned every second.</div></div>`,
               },
               {
                 day: "Sun May 31",
                 type: "Rest",
                 dur: "",
                 zone: "",
-                details: "Rest. Reflect. You did it.",
-                alt: "",
+                details: "Rest. Reflect.",
+                exp: `<div class="detail-section"><div class="detail-text">Total rest. Start thinking about the next adventure.</div></div>`,
               },
             ],
           },
         ];
-
-        // ── Determine current week ─────────────────────────────────────────────────────
+        /* ═══ RENDERING ═══ */
         const today = new Date();
-        function parseWeekStart(dates) {
-          const m = dates.match(/^(\w+)\s+(\d+)/);
+        function parseWeekStart(d) {
+          const m = d.match(/^(\w+)\s+(\d+)/);
           if (!m) return new Date(2026, 0, 1);
-          const months = { Mar: 2, Apr: 3, May: 4, Jun: 5 };
-          return new Date(2026, months[m[1]] || 0, parseInt(m[2]));
+          const mo = { Mar: 2, Apr: 3, May: 4 };
+          return new Date(2026, mo[m[1]] || 0, parseInt(m[2]));
         }
         let currentWeekId = 1;
         for (const w of weeks) {
-          const start = parseWeekStart(w.dates);
-          const end = new Date(start);
-          end.setDate(end.getDate() + 6);
-          if (today >= start && today <= end) {
+          const s = parseWeekStart(w.dates),
+            e = new Date(s);
+          e.setDate(e.getDate() + 6);
+          if (today >= s && today <= e) {
             currentWeekId = w.id;
             break;
           }
-          if (today < start) break;
+          if (today < s) break;
           currentWeekId = w.id;
         }
 
-        // ── Tab Navigation ─────────────────────────────────────────────────────────────
-        const tabBtns = document.querySelectorAll(".tab-btn");
-        const pages = document.querySelectorAll(".page");
-        tabBtns.forEach((btn) => {
+        document.querySelectorAll(".tab-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
-            tabBtns.forEach((b) => b.classList.remove("active"));
+            document
+              .querySelectorAll(".tab-btn")
+              .forEach((b) => b.classList.remove("active"));
             btn.classList.add("active");
-            pages.forEach((p) => p.classList.remove("active"));
+            document
+              .querySelectorAll(".page")
+              .forEach((p) => p.classList.remove("active"));
             document
               .getElementById("page-" + btn.dataset.page)
               .classList.add("active");
           });
         });
 
-        // ── Volume Chart ───────────────────────────────────────────────────────────────
         const ctx = document.getElementById("volumeChart").getContext("2d");
-        const barColors = weeks.map((w) => {
+        const bc = weeks.map((w) => {
           if (w.isRace) return "rgba(251,191,36,0.6)";
           if (w.phase === "Recovery") return "rgba(100,116,139,0.4)";
           if (w.phase === "Taper") return "rgba(56,189,248,0.5)";
@@ -2147,10 +2443,8 @@
             datasets: [
               {
                 data: weeks.map((w) => w.hours),
-                backgroundColor: barColors,
-                borderColor: barColors.map((c) =>
-                  c.replace(/[\d.]+\)$/, "0.9)"),
-                ),
+                backgroundColor: bc,
+                borderColor: bc.map((c) => c.replace(/[\d.]+\)$/, "0.9)")),
                 borderWidth: 1,
                 borderRadius: 3,
               },
@@ -2184,13 +2478,15 @@
           },
         });
 
-        // ── Week Rendering ─────────────────────────────────────────────────────────────
         const weekStrip = document.getElementById("week-strip");
         const weekHeaderArea = document.getElementById("week-header-area");
         const weekContent = document.getElementById("week-content");
+        const detailArea = document.getElementById("detail-area");
+        let selectedDayIdx = null,
+          currentWeekData = null;
 
-        function badgeClass(type) {
-          const t = type.toLowerCase();
+        function badgeClass(t) {
+          t = t.toLowerCase();
           if (t === "rest") return "badge-rest";
           if (t === "zwift") return "badge-zwift";
           if (t === "mtb") return "badge-mtb";
@@ -2202,36 +2498,50 @@
         }
 
         function renderWeek(week) {
-          weekHeaderArea.innerHTML = `<div class="week-header">
-    <h2>${week.title} <span style="color:var(--text-dim);font-weight:400;font-size:0.85rem">— ${week.dates}</span></h2>
-    <div class="meta">
-      <span>Phase <strong>${week.phase}</strong></span>
-      ${week.hours ? `<span>Volume <strong>${week.hours}h</strong></span>` : "<span><strong>Race Week</strong></span>"}
-    </div>
-  </div>`;
-
+          currentWeekData = week;
+          selectedDayIdx = null;
+          detailArea.innerHTML = "";
+          weekHeaderArea.innerHTML = `<div class="week-header"><h2>${week.title} <span style="color:var(--text-dim);font-weight:400;font-size:.85rem">— ${week.dates}</span></h2><div class="meta"><span>Phase <strong>${week.phase}</strong></span>${week.hours ? `<span>Volume <strong>${week.hours}h</strong></span>` : "<span><strong>Race Week</strong></span>"}</div></div>`;
           weekContent.innerHTML = "";
-          week.days.forEach((d) => {
-            const isRest = d.type.toLowerCase() === "rest";
+          week.days.forEach((d, idx) => {
+            const isRest = d.type.toLowerCase() === "rest" && !d.exp;
             const isRace = d.type.toLowerCase() === "race";
-            const dayParts = d.day.split(" ");
-            const dayLabel = dayParts[0];
-            const dateLabel = dayParts.slice(1).join(" ");
-
+            const dp = d.day.split(" "),
+              dayL = dp[0],
+              dateL = dp.slice(1).join(" ");
             const card = document.createElement("div");
             card.className =
               "day-card" + (isRest ? " rest" : "") + (isRace ? " race" : "");
-            card.innerHTML = `
-      <div class="day-label">${dayLabel} <span style="color:var(--text)">${dateLabel}</span></div>
-      <span class="day-type-badge ${badgeClass(d.type)}">${d.type}${d.dur ? " · " + d.dur : ""}${d.zone ? " · " + d.zone : ""}</span>
-      <div class="day-details">${d.details}</div>
-      ${d.alt ? `<div class="day-zwift-alt"><span class="alt-label">Alt</span> ${d.alt}</div>` : ""}
-    `;
+            card.dataset.idx = idx;
+            card.innerHTML = `<div class="day-label">${dayL} <span style="color:var(--text)">${dateL}</span></div><span class="day-type-badge ${badgeClass(d.type)}">${d.type}${d.dur ? " · " + d.dur : ""}${d.zone ? " · " + d.zone : ""}</span><div class="day-details">${d.details}</div>`;
+            if (d.exp) card.addEventListener("click", () => toggleDetail(idx));
             weekContent.appendChild(card);
           });
         }
 
-        // Build week strip
+        function toggleDetail(idx) {
+          const cards = weekContent.querySelectorAll(".day-card");
+          if (selectedDayIdx === idx) {
+            cards[idx].classList.remove("selected");
+            detailArea.innerHTML = "";
+            selectedDayIdx = null;
+            return;
+          }
+          if (selectedDayIdx !== null && cards[selectedDayIdx])
+            cards[selectedDayIdx].classList.remove("selected");
+          cards[idx].classList.add("selected");
+          selectedDayIdx = idx;
+          const d = currentWeekData.days[idx];
+          if (!d.exp) {
+            detailArea.innerHTML = "";
+            selectedDayIdx = null;
+            cards[idx].classList.remove("selected");
+            return;
+          }
+          detailArea.innerHTML = `<div class="detail-panel"><h3>${d.day} — ${d.type}${d.zone ? " · " + d.zone : ""}</h3>${d.exp}</div>`;
+          detailArea.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+
         weeks.forEach((w) => {
           const btn = document.createElement("button");
           btn.className = "week-btn" + (w.isRace ? " race-week" : "");
@@ -2246,12 +2556,10 @@
           });
           weekStrip.appendChild(btn);
         });
-
-        // Activate current week
-        const currentBtn =
+        const cb =
           weekStrip.querySelector(".week-btn.current") ||
           weekStrip.querySelector(".week-btn");
-        currentBtn.classList.add("active");
+        cb.classList.add("active");
         renderWeek(weeks.find((w) => w.id === currentWeekId) || weeks[0]);
       });
     </script>
