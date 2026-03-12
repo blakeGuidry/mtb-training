@@ -3,9 +3,7 @@
 A periodized training plan for the 2026 BC Bike Race (May 23–29), a 7-day mountain bike stage race across Vancouver Island, BC. This plan covers the final 13 weeks of preparation: Build 1, Build 2 / Specialty, Taper, and Race.
 
 **Start Date:** March 2, 2026
-
 **Race Dates:** May 23–29, 2026
-
 **Equipment:** Wahoo Kickr Core 2 + Zwift (indoor) | Mountain Bike with Garmin Watch + HR Monitor, no power meter (outdoor)
 
 ---
@@ -106,6 +104,23 @@ The BC Bike Race runs an active Zwift Club with a weekly schedule of group rides
 
 Join at: [BCBR Club on Zwift](https://www.zwift.com/clubs/BCBR/home)
 
+### 1.6 Cadence Targets
+
+Cadence is a tradeoff between cardiovascular load and muscular load. Low cadence (50–65 RPM) loads the muscles heavily but keeps heart rate lower. High cadence (100–110+ RPM) reduces force per stroke but drives heart rate up. This plan trains the full cadence spectrum because BCBR singletrack constantly forces transitions between grinding steep pitches and spinning flats. Default to 85–95 RPM for general training — this is the range where most cyclists produce the best balance of power output and metabolic efficiency.
+
+| Session Type | Target RPM | Rationale |
+|:-------------|:-----------|:----------|
+| Z2 Endurance (default) | 85–95 | Best balance of power and efficiency. "All-day" cadence. |
+| Sweet Spot / Threshold (ERG on) | 85–95 | Let the trainer control resistance. Focus on smooth pedal strokes. |
+| VO2 Max intervals | 90–100 | Slightly higher reduces muscular fatigue, allowing more intervals before failure. |
+| Low-cadence torque blocks | 50–65 | Deliberate exception. High-torque pedaling for steep, loose climbs. |
+| Spin-up drills | 100–120 | 30s progressive acceleration in easy gear, Z1/Z2 power. Trains neuromuscular transition from grind to spin. |
+| Microbursts (15s on/off) | Natural (~95–105) | Let cadence rise naturally during surges. Don't fight it. |
+| Race day (outdoor) | 50–110+ | Terrain dictates. Training both ends prepares legs for constant transitions. |
+
+**Spin-up Drill Protocol:** During Thursday Z2 endurance rides, include 3–4 spin-ups alongside the low-cadence blocks. Each spin-up is 30 seconds of progressively increasing cadence from 90 to 110–120 RPM in an easy gear, staying at Z1/Z2 power. This trains pedaling smoothness and the neuromuscular ability to "shift gears" from torque mode to spin mode — critical for accelerating out of steep climbs onto flats without losing momentum.
+
+
 ---
 
 ## Section 2: Race Profile & Training Targets
@@ -137,7 +152,7 @@ Local terrain provides approximately 100–115 ft/mi of climbing, which is 65–
 
 1. **Hill Repeats (Primary):** Restructure Saturday long rides around repeating local climbs rather than riding point-to-point routes. Loop the best available climbs to accumulate target elevation gain. Example: if the best local climb is 500 ft over 1.5 miles, 10 repeats yields 5,000 ft of climbing.
 2. **Zwift Climbing Routes (Secondary):** On alternating Thursdays, ride Alpe du Zwift, Road to Sky, or Innsbruck KOM with ERG off. The Kickr Core 2 simulates gradient resistance, training gear selection and sustained climbing pacing.
-3. **Low-Cadence Torque Blocks (Supplementary):** All indoor Z2 endurance rides include structured blocks of 6–8 minutes at 50–65 RPM and Z2–Z3 power. This trains the high-torque pedaling pattern required for steep, loose climbs without needing actual hills.
+3. **Cadence Spectrum Training (Supplementary):** All indoor Z2 endurance rides include low-cadence torque blocks (6–8 minutes at 50–65 RPM, Z2–Z3 power) and high-cadence spin-up drills (30s to 110–120 RPM). The torque blocks train the pedaling pattern for steep, loose climbs; the spin-ups train the neuromuscular transition to accelerating on flats after cresting a climb.
 
 Do NOT compensate for low elevation density by pushing a higher HR zone on flat terrain. Riding Z4 on flat ground trains a different neuromuscular pattern than riding Z3 on a steep climb. Climbing-specific fitness comes from climbing.
 
@@ -160,7 +175,7 @@ Following the Base 2 block (completed), this is a dedicated recovery week focuse
 
 ### 3.2 Weeks 2–4: Build 1 (Mesocycle 6)
 
-With a massive aerobic base established in the prior 17 weeks, this mesocycle begins to "build the ceiling" by introducing high-intensity training. The progression uses a sweet spot bridge (Weeks 2–3: 88–93% FTP) before full Z4 threshold intervals (Week 4: 95–105% FTP). The weekend long ride incorporates sustained Z3 (Tempo) and Z4 (Threshold) efforts to simulate race-pace climbing. Low-cadence torque blocks are introduced on all indoor endurance rides. Every other Thursday features a Zwift climbing route (ERG off) to build gradient-specific fitness.
+With a massive aerobic base established in the prior 17 weeks, this mesocycle begins to "build the ceiling" by introducing high-intensity training. The progression uses a sweet spot bridge (Weeks 2–3: 88–93% FTP) before full Z4 threshold intervals (Week 4: 95–105% FTP). The weekend long ride incorporates sustained Z3 (Tempo) and Z4 (Threshold) efforts to simulate race-pace climbing. Low-cadence torque blocks and high-cadence spin-up drills are introduced on all indoor endurance rides. Every other Thursday features a Zwift climbing route (ERG off) to build gradient-specific fitness.
 
 ### 3.3 Week 5: Recovery
 
@@ -198,15 +213,15 @@ During the 7-day BC Bike Race, all training adaptation is complete. The entire f
 
 ## Section 4: Integrated Strength & Conditioning Program
 
-The two strength phases are aligned with the cycling macrocycle to support, not detract from, on-bike goals. Phase 1 uses an A/B split across its two weekly sessions to provide variety and cover the full spectrum of MTB demands — concentric climbing power, eccentric descending resilience, grip endurance, and pulling strength — without bloating any single session.
+Two strength phases remain active in this plan, plus an ongoing core routine. The phases are aligned with the cycling macrocycle to support, not detract from, on-bike goals. Phase 1 uses an A/B split across its two weekly sessions to provide variety and cover the full spectrum of MTB demands — concentric climbing power, eccentric descending resilience, grip endurance, and pulling strength — without bloating any single session.
 
 ### 4.1 Phase 1 – Strength Maintenance (Heavy) (Weeks 1–9)
 
-- **Goal:** Maintain the maximal strength and neuromuscular efficiency gained during the prior Maximum Strength phase, which is critical for improving cycling economy and delaying fatigue. This phase aligns with the Build 1 and Build 2 blocks.
+- **Goal:** Maintain the maximal strength and neuromuscular efficiency gained during the prior Maximum Strength phase (completed), which is critical for improving cycling economy and delaying fatigue. This phase aligns with the Build 1 and Build 2 blocks.
 - **Protocol:** 2 sessions per week (Session A on Tuesdays, Session B on Fridays). 3 sets of 3–6 repetitions unless noted. Load: Heavy (80–95% 1RM). Rest: 2–4 minutes between sets. Farmer's carries and wrist roller are performed at the end of the session.
 - **Rationale:** Evidence strongly supports maintaining _intensity_ (heavy weight) while reducing _volume_ (sets/reps) during the build phase. High-rep "endurance" lifting is less effective as it merely replicates the metabolic stress of cycling. This protocol maintains neural drive without inducing excessive fatigue or muscle soreness.
 
-**Table 3a: Phase 1 Session A – Climbing Power & Unilateral Strength (Tuesday)**
+**Table 1a: Phase 1 Session A – Climbing Power & Unilateral Strength (Tuesday)**
 
 | Exercise | Sets | Reps | Weight | Why |
 |:---------|:-----|:-----|:-------|:----|
@@ -216,7 +231,7 @@ The two strength phases are aligned with the cycling macrocycle to support, not 
 | Bulgarian Split Squat | 3 | 3–6/leg | Heavy | MTB is a single-leg sport. Builds unilateral strength, glute activation, and lateral stability that bilateral squats miss. Protects against asymmetry that compounds over 7 race days. |
 | Farmer's Carry | 3 | 40–60s | Heavy | Grip endurance, anti-lateral-flexion core stability, and shoulder stabilization. After 5–6 days of racing, grip fatigue limits performance on technical descents. |
 
-**Table 3b: Phase 1 Session B – Descending Resilience & Grip Endurance (Friday)**
+**Table 1b: Phase 1 Session B – Descending Resilience & Grip Endurance (Friday)**
 
 | Exercise | Sets | Reps | Weight | Why |
 |:---------|:-----|:-----|:-------|:----|
@@ -237,7 +252,7 @@ The two strength phases are aligned with the cycling macrocycle to support, not 
 - **Protocol:** 1 session per week. 2 sets of 3–5 repetitions. Load: Heavy, but not to failure (e.g., ~80% 1RM).
 - **Rationale:** This follows the "minimum effective dose" strategy. The goal is to keep the nervous system primed while allowing full recovery by reducing _volume_ (reps) but not _intensity_ (heavy lifting). The farmer's carry is shortened but retained to maintain grip endurance through race week.
 
-**Table 4: Phase 2 Workout (Taper Maintenance)**
+**Table 2: Phase 2 Workout (Taper Maintenance)**
 
 | Exercise | Sets | Reps | Weight | Why |
 |:---------|:-----|:-----|:-------|:----|
@@ -251,7 +266,7 @@ The two strength phases are aligned with the cycling macrocycle to support, not 
 
 A strong core is the "connection point" that transfers power from the legs to the pedals and allows the upper body to control the bike. This routine should be performed 2–3 times per week, ideally after easier Z2 rides. Two variations alternate to provide variety and cover both static stability and dynamic anti-rotation demands.
 
-**Table 5a: Core Routine A – Anti-Rotation & Coordination (Perform as a circuit)**
+**Table 3a: Core Routine A – Anti-Rotation & Coordination (Perform as a circuit)**
 
 | Exercise | Reps / Duration | Why |
 |:---------|:----------------|:----|
@@ -261,7 +276,7 @@ A strong core is the "connection point" that transfers power from the legs to th
 | Pallof Press (L/R) | 10 each side, 2s hold | Gold standard anti-rotation exercise (cable or band). On technical singletrack, your lower body and bike are constantly being knocked laterally while your core must resist that rotation to keep power going to the pedals. |
 | Single-Leg Glute Bridge | 10 each side | Progression from bilateral glute bridge, which is likely too easy at this point. Doubles the load per glute, trains anti-rotation demand of stabilizing the pelvis on one leg, and better mirrors the single-leg pedaling pattern. |
 
-**Table 5b: Core Routine B – Dynamic Stability & Mobility (Perform as a circuit)**
+**Table 3b: Core Routine B – Dynamic Stability & Mobility (Perform as a circuit)**
 
 | Exercise | Reps / Duration | Why |
 |:---------|:----------------|:----|
@@ -304,11 +319,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Mar 2 | Rest | Rest | 0:00 | N/A | Full rest day. | |
 | Tue | Mar 3 | Ride | Zwift | 0:45 | Z1 | 45-min recovery spin. Flat route, easy cadence. | Free ride Z1, any flat Zwift route. ERG off. |
-| Wed | Mar 4 | Ride | Zwift | 1:00 | Z2 | 60-min endurance. Steady aerobic spin. | Endurance collection: Jon's Mix (~60 min) or BCBR Club Wed ride. \| Outdoor alt: 60 min easy trail ride, Z2 HR, ~8–10 mi. |
+| Wed | Mar 4 | Ride | Zwift | 1:00 | Z2 | 60-min endurance. Steady aerobic spin. | Foundation (~60 min) or BCBR Club Wed ride. \| Outdoor alt: 60 min easy trail ride, Z2 HR, ~8–10 mi. |
 | Thu | Mar 5 | FTP Test | Zwift | 0:45 | Max | ZWIFT RAMP TEST. Establish new FTP baseline for all remaining weeks. | Zwift Ramp Test (under Workouts > FTP Tests). Enter result in Zwift profile. Record this number. |
-| Fri | Mar 6 | Strength | Strength | 0:45 | N/A | Phase 1 Session A (Table 3a), 1–2 sets only. Light. | |
+| Fri | Mar 6 | Strength | Strength | 0:45 | N/A | Phase 1 Session A (Table 1a), 1–2 sets only. Light. | |
 | Sat | Mar 7 | Ride | MTB | 1:30 | Z2 | Easy trail ride. 10–12 mi, ~1,200 ft elev. Flow and fun, no pushing. | Rain day: 90 min Zwift free ride Z2, flat route. Include 3×5 min @ 55–60 RPM low-cadence work. |
-| Sun | Mar 8 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection or BCBR Club Sunday 90-min ride (leave at 60 min). \| Outdoor alt: 60 min easy trail ride. |
+| Sun | Mar 8 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation (~60 min) or BCBR Club Sunday 90-min ride (leave at 60 min). \| Outdoor alt: 60 min easy trail ride. |
 | **Total** | | | | **5:45** | | | |
 
 ---
@@ -320,10 +335,10 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Mar 9 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | Mar 10 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Mar 11 | Ride | Zwift | 1:15 | Z3/Z4 | Sweet spot session. Main set: 3×12 min @ 88–93% FTP, 5 min Z2 between. +15 min WU/CD. | Zwift: SST (Short) from Sweet Spot collection. ERG on. \| Outdoor alt: Find a 12–15 min climb. Ride 3× at "comfortably hard" (Z3–Z4 HR). Descend to recover. |
-| Thu | Mar 12 | Ride | Zwift | 1:30 | Z2 | 90-min Z2 endurance. Include 4×6 min low-cadence blocks (55–60 RPM @ Z2–Z3 power). ERG off. | Endurance collection: Foundation (~90 min) with manual low-cadence blocks. \| Outdoor alt: 90 min trail ride, 12–15 mi, 1,500 ft elev, Z2 HR. Grind steep pitches in a big gear. |
-| Fri | Mar 13 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Tue | Mar 10 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Mar 11 | Ride | Zwift | 1:15 | Z3/Z4 | Sweet spot session. Main set: 3×12 min @ 88–93% FTP, 5 min Z2 between. +15 min WU/CD. | Zwift: Custom workout in Workout Builder (3×12 min @ 88–93% FTP, 5 min Z2 rest). ERG on. Alt: SST (Med) (60–90 min to burn) — over/under sweet spot blocks, similar intensity but different structure. \| Outdoor alt: Find a 12–15 min climb. Ride 3× at "comfortably hard" (Z3–Z4 HR). Descend to recover. |
+| Thu | Mar 12 | Ride | Zwift | 1:30 | Z2 | 90-min Z2 endurance. Alternate: 4×6 min low-cadence blocks (55–60 RPM @ Z2–Z3) and 3×30s spin-up drills (accelerate to 110–120 RPM, easy gear). ERG off. | Foundation (~90 min) with manual low-cadence and spin-up blocks. \| Outdoor alt: 90 min trail ride, 12–15 mi, 1,500 ft elev, Z2 HR. Grind steep pitches in a big gear. |
+| Fri | Mar 13 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Mar 14 | Ride | MTB | 4:00 | Z2/Z3 | 22–26 mi, 4,000 ft elev target (~155–180 ft/mi). Hill repeats as needed. 3×20 min Z3 on climbs. Track VAM at Z3. | Rain day: 3.5h Zwift. 20 min Z2 WU → 3×20 min @ 88–93% FTP (5 min Z2 rest) → 60 min Z2 → 15 min CD. ERG on for intervals, off for Z2. |
 | Sun | Mar 15 | Ride | MTB | 2:00 | Z2 | 12–15 mi, 2,000 ft elev. Z2 recovery ride. Track VAM at Z2 and compare to Saturday. | Rain day: 2h Zwift Z2 free ride, scenic route. Include 3×5 min low-cadence blocks. ERG off. |
 | **Total** | | | | **11:00** | | | |
@@ -337,10 +352,10 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Mar 16 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | Mar 17 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Mar 18 | Ride | Zwift | 1:15 | Z4 | Threshold session. Main set: 3×10 min @ 95–100% FTP, 5 min Z2 between. +15 min WU/CD. | Zwift: Over Unders workout or The McCarthy Special. ERG on. \| Outdoor alt: 3× a 10–12 min climb at Z4 HR (95–105% LTHR). Descend to recover. |
+| Tue | Mar 17 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Mar 18 | Ride | Zwift | 1:15 | Z4 | Threshold session. Main set: 3×10 min @ 95–100% FTP, 5 min Z2 between. +15 min WU/CD. | Zwift: Custom workout (3×10 min @ 95–100% FTP, 5 min Z2 rest). ERG on. Alt: Over-Unders (Threshold collection, ~47 min) — alternating above/below FTP in shorter blocks, same training zone. \| Outdoor alt: 3× a 10–12 min climb at Z4 HR (95–105% LTHR). Descend to recover. |
 | Thu | Mar 19 | Ride | Zwift | 1:30 | Z3 | CLIMBING DAY. 90 min on Alpe du Zwift or Road to Sky. ERG OFF. Ride at Z3 effort. Practice gear selection. | Outdoor alt: 90 min trail ride, 15–18 mi. Choose hilliest available route. Ride all climbs at sustained Z3 HR. |
-| Fri | Mar 20 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Fri | Mar 20 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Mar 21 | Ride | MTB | 4:00 | Z2/Z3 | 22–26 mi, 4,000 ft elev target. Hill repeats as needed. 2×30 min Z3 on climbs. | Rain day: 3.5h Zwift. 20 min Z2 WU → 2×30 min @ 88–93% FTP (8 min rest) → 60 min Z2 → CD. |
 | Sun | Mar 22 | Ride | MTB | 2:00 | Z2 | 12–15 mi, 2,000 ft elev. Z2 recovery ride. | Rain day: 2h Zwift Z2 free ride with low-cadence blocks. ERG off. |
 | **Total** | | | | **11:00** | | | |
@@ -354,10 +369,10 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Mar 23 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | Mar 24 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Mar 25 | Ride | Zwift | 1:15 | Z4 | Threshold session. Main set: 2×15 min @ 95–105% FTP, 8 min Z2 between. +15 min WU/CD. | Zwift: The Wringer or Annika Langvad Series Workout 5. ERG on. \| Outdoor alt: 2× your longest sustained climb at Z4 HR. Full descent recovery. |
-| Thu | Mar 26 | Ride | Zwift | 1:30 | Z2 | 90-min Z2 endurance. Include 4×6 min low-cadence blocks (55–60 RPM). ERG off. | Endurance collection ~90 min. \| Outdoor alt: 90 min trail ride, 12–15 mi, 1,500 ft elev, Z2 HR. |
-| Fri | Mar 27 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Tue | Mar 24 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Mar 25 | Ride | Zwift | 1:15 | Z4 | Threshold session. Main set: 2×15 min @ 95–105% FTP, 8 min Z2 between. +15 min WU/CD. | Zwift: 2x15 FTP Intervals (30–60 min to burn, ~55 min) — exact match. ERG on. Alt: 3x15 FTP Intervals (90+ min to burn, 1h39m) — same intervals but 3 sets for a bigger session. \| Outdoor alt: 2× your longest sustained climb at Z4 HR. Full descent recovery. |
+| Thu | Mar 26 | Ride | Zwift | 1:30 | Z2 | 90-min Z2 endurance. Alternate: 4×6 min low-cadence blocks (55–60 RPM) and 3×30s spin-up drills (110–120 RPM, easy gear). ERG off. | Foundation (~90 min) with cadence drills. \| Outdoor alt: 90 min trail ride, 12–15 mi, 1,500 ft elev, Z2 HR. |
+| Fri | Mar 27 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Mar 28 | Ride | MTB | 4:30 | Z2/Z4 | 24–28 mi, 4,500 ft elev target (~160–185 ft/mi). Hill repeats as needed. 3×15 min Z4 on climbs. Note time per 1,000 ft at Z4. | Rain day: 3.5h Zwift. 20 min WU → 3×15 min @ 95–105% FTP (8 min Z2 rest) → 45 min Z2 → CD. |
 | Sun | Mar 29 | Ride | MTB | 2:00 | Z2 | 12–15 mi, 2,000 ft elev. Z2 recovery ride. | Rain day: 2h Zwift Z2 free ride with low-cadence blocks. |
 | **Total** | | | | **11:30** | | | |
@@ -372,11 +387,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Mar 30 | Rest | Rest | 0:00 | N/A | Full rest day. | |
 | Tue | Mar 31 | Ride | Zwift | 0:45 | Z1 | 45-min recovery spin. | Free ride Z1, flat route. ERG off. |
-| Wed | Apr 1 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection or BCBR Club Wed ride. \| Outdoor alt: 60 min easy trail ride. |
+| Wed | Apr 1 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation or BCBR Club Wed ride. \| Outdoor alt: 60 min easy trail ride. |
 | Thu | Apr 2 | Ride | Zwift | 0:30 | Z1 | 30-min recovery spin. | Free ride Z1 or Recovery collection ~30 min. |
-| Fri | Apr 3 | Strength | Strength | 0:30 | N/A | Phase 1 Session A (Table 3a), 1–2 sets only. Light. | |
+| Fri | Apr 3 | Strength | Strength | 0:30 | N/A | Phase 1 Session A (Table 1a), 1–2 sets only. Light. | |
 | Sat | Apr 4 | Ride | MTB | 1:30 | Z2 | Easy trail ride. Fun, flow, no pushing. 10–12 mi. | Rain day: 90 min Zwift Z2 free ride. |
-| Sun | Apr 5 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection or BCBR Club Sunday ride. \| Outdoor alt: 60 min easy trail ride. |
+| Sun | Apr 5 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation or BCBR Club Sunday ride. \| Outdoor alt: 60 min easy trail ride. |
 | **Total** | | | | **5:15** | | | |
 
 ---
@@ -388,11 +403,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Apr 6 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | Apr 7 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Apr 8 | Ride | Zwift | 1:00 | Z5 | VO2 Max session. Main set: 6×3 min @ 110–120% FTP, 3 min Z2 between. +15 min WU/CD. | Zwift: The Gorby or Annika Langvad Workout 2. ERG on. \| Outdoor alt: Hill repeats – 6× a steep 3–5 min climb at max sustainable effort (Z5 HR / RPE 6–7). Descend to recover. |
+| Tue | Apr 7 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Apr 8 | Ride | Zwift | 1:00 | Z5 | VO2 Max session. Main set: 6×3 min @ 110–120% FTP, 3 min Z2 between. +15 min WU/CD. | Zwift: Custom workout (6×3 min @ 110–120% FTP, 3 min Z2 rest). ERG on. Alt: The Gorby (60–90 min to burn, 60 min) — 5×5 min @ 110% FTP, fewer but longer intervals in the same VO2 zone. \| Outdoor alt: Hill repeats – 6× a steep 3–5 min climb at max sustainable effort (Z5 HR / RPE 6–7). Descend to recover. |
 | Thu | Apr 9 | Ride | Zwift | 1:30 | Z2/Z5 | MICROBURST DAY. 20 min Z2 WU → 20 min microbursts (15s @ 150% FTP / 15s @ 55% FTP) → 10 min Z2 → 15 min microbursts → 15 min Z2 CD. | Custom Zwift workout or HIIT collection: Microbursts. ERG on. \| Outdoor alt: Ride a looping trail with punchy features. Attack every short rise hard (15–20s max), recover on flats. 90 min total. |
 | | | Optional | Start Sim | 0:20 | Max | 6–8×20s max sprints from stop, 2–3 min Z2 recovery between. | Custom Zwift workout. After Thu ride or separate session. |
-| Fri | Apr 10 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Fri | Apr 10 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Apr 11 | Ride | MTB | 4:00 | Sim | STAGE RACE SIM: Kitchen Sink. 22–26 mi, 4,000 ft elev. 3×15 min Z4, 4×3 min Z5 on climbs. Vary intensity by repeat. End with 20–30 min technical skills under fatigue. | Rain day: 3.5h Zwift. 20 min WU → 2×15 min @ 95–100% FTP (8 min rest) → 10 min Z2 → 4×3 min @ 110–115% FTP (3 min rest) → 45 min Z2 → CD. |
 | Sun | Apr 12 | Ride | MTB | 3:00 | Z2/Z3 | STAGE RACE SIM: Fatigued ride. 16–20 mi, 3,000 ft elev. Steady Z2, push Z3 on climbs. Track pace degradation vs Saturday. | Rain day: 2.5h Zwift Z2/Z3 on tired legs. 90 min Z2 + 2×15 min Z3 pushes + low-cadence blocks. |
 | **Total** | | | | **11:45+** | | | |
@@ -406,11 +421,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Apr 13 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | Apr 14 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Apr 15 | Ride | Zwift | 1:15 | Z4 | Sustained threshold. Main set: 2×20 min @ 95–100% FTP, 10 min Z2 between. +15 min WU/CD. | Zwift: 2×20 FTP Intervals from Threshold collection. ERG on. \| Outdoor alt: 2× your longest sustained climb (~20 min each) at Z4 HR. |
+| Tue | Apr 14 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Apr 15 | Ride | Zwift | 1:15 | Z4 | Sustained threshold. Main set: 2×20 min @ 95–100% FTP, 10 min Z2 between. +15 min WU/CD. | Zwift: 2x20 FTP Intervals (60–90 min to burn, 1h20m) — exact match. ERG on. \| Outdoor alt: 2× your longest sustained climb (~20 min each) at Z4 HR. |
 | Thu | Apr 16 | Ride | Zwift | 1:30 | Z3 | CLIMBING DAY. 90 min on Alpe du Zwift or Innsbruck KOM. ERG OFF. Ride at Z3 effort. Practice pacing on sustained climbs. | Outdoor alt: 90 min trail ride on hilliest available route. Sustained Z3 on all climbs. |
 | | | Optional | Start Sim | 0:20 | Max | 6–8×20s max sprints from stop, 2–3 min Z2 recovery. | Custom Zwift workout or do on the trail after Thu ride. |
-| Fri | Apr 17 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Fri | Apr 17 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Apr 18 | Ride | MTB | 4:30 | Sim | STAGE RACE SIM: Kitchen Sink. 24–28 mi, 4,500 ft elev. 2×20 min Z4, 5×3 min Z5. End with technical skills block. | Rain day: 4h Zwift. WU → 2×20 min @ 95–100% FTP (10 min rest) → 5×3 min @ 110–115% FTP (3 min rest) → 60 min Z2 → CD. |
 | Sun | Apr 19 | Ride | MTB | 3:30 | Z2/Z3 | STAGE RACE SIM: Fatigued ride. 18–22 mi, 3,500 ft elev. Steady Z3. Practice race nutrition on climbs. | Rain day: 3h Zwift Z2/Z3 on tired legs. 2h Z2 + 2×20 min Z3 + low-cadence blocks. |
 | **Total** | | | | **13:00+** | | | |
@@ -424,11 +439,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Apr 20 | Rest | Rest | 0:00 | N/A | Full rest day. Sleep is critical this week. | |
-| Tue | Apr 21 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 3a). | |
-| Wed | Apr 22 | Ride | Zwift | 1:00 | Z5 | VO2 Max session. Main set: 5×4 min @ 106–120% FTP, 4 min Z2 between. +15 min WU/CD. | Zwift: HIIT collection Tabata or Annika Langvad Workout 4. ERG on. \| Outdoor alt: Hill repeats – 5× a 4–5 min steep climb at max sustainable effort. Descend to recover. |
-| Thu | Apr 23 | Ride | Zwift | 1:30 | Z2/Z5 | MICROBURST DAY. 20 min Z2 WU → 20 min microbursts (15s @ 150% / 15s @ 55%) → 10 min Z2 → 20 min microbursts → 15 min Z2 CD. Include 5×8 min low-cadence blocks in Z2 portions. | Custom Zwift workout. ERG on for bursts. \| Outdoor alt: Punchy trail with constant short climbs. Attack each rise, recover between. 90 min. |
+| Tue | Apr 21 | Strength | Strength | 1:00 | N/A | Phase 1 Session A (Table 1a). | |
+| Wed | Apr 22 | Ride | Zwift | 1:00 | Z5 | VO2 Max session. Main set: 5×4 min @ 106–120% FTP, 4 min Z2 between. +15 min WU/CD. | Zwift: Custom workout (5×4 min @ 106–120% FTP, 4 min Z2 rest). ERG on. Alt: The Gorby (60–90 min to burn, 60 min) — 5×5 min @ 110% FTP, same reps but slightly longer/lower intensity. \| Outdoor alt: Hill repeats – 5× a 4–5 min steep climb at max sustainable effort. Descend to recover. |
+| Thu | Apr 23 | Ride | Zwift | 1:30 | Z2/Z5 | MICROBURST DAY. 20 min Z2 WU → 20 min microbursts (15s @ 150% / 15s @ 55%) → 10 min Z2 → 20 min microbursts → 15 min Z2 CD. Include 5×8 min low-cadence blocks and 3×30s spin-up drills in Z2 portions. | Custom Zwift workout. ERG on for bursts. \| Outdoor alt: Punchy trail with constant short climbs. Attack each rise, recover between. 90 min. |
 | | | Optional | Start Sim | 0:20 | Max | 6–8×20s max sprints from stop, 2–3 min Z2 recovery. | |
-| Fri | Apr 24 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 3b) + Core (alternating Table 5a/5b). | |
+| Fri | Apr 24 | Strength | Strength | 1:15 | N/A | Phase 1 Session B (Table 1b) + Core (alternating Table 3a/3b). | |
 | Sat | Apr 25 | Ride | MTB | 5:00 | Sim | PEAK STAGE RACE SIM: Kitchen Sink. 26–30 mi, 5,000 ft elev. 2×20 min Z4, 4×4 min Z5. Hill repeats to hit elev target. End with 30 min technical skills under fatigue. THIS IS YOUR HARDEST RIDE. | Rain day: 4h Zwift. WU → 2×20 min @ 95–100% FTP (10 min rest) → 4×4 min @ 110–120% FTP (4 min rest) → 60 min Z2 → CD. Mental fortitude day. |
 | Sun | Apr 26 | Ride | MTB | 4:00 | Z2/Z3 | PEAK STAGE RACE SIM: Fatigued ride. 22–26 mi, 4,000 ft elev. Steady Z3. Your legs should feel like Day 5 of BCBR. Track pace degradation vs Saturday. | Rain day: 3.5h Zwift Z2/Z3 on tired legs. 2.5h Z2 + 2×20 min Z3 + low-cadence blocks. |
 | **Total** | | | | **13:45+** | | | |
@@ -443,11 +458,11 @@ Execute this protocol after every race stage to maximize next-day performance:
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | Apr 27 | Rest | Rest | 0:00 | N/A | Full rest day. | |
 | Tue | Apr 28 | Ride | Zwift | 0:45 | Z1 | 45-min recovery spin. | Free ride Z1. \| Outdoor alt: 45 min very easy trail spin. |
-| Wed | Apr 29 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection or BCBR Club ride. \| Outdoor alt: 60 min Z2 trail ride. |
+| Wed | Apr 29 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation or BCBR Club ride. \| Outdoor alt: 60 min Z2 trail ride. |
 | Thu | Apr 30 | Ride | Zwift | 0:30 | Z1 | 30-min recovery spin. | Free ride Z1. |
-| Fri | May 1 | Strength | Strength | 0:30 | N/A | Phase 1 Session A (Table 3a), 1–2 sets only. Light. | |
+| Fri | May 1 | Strength | Strength | 0:30 | N/A | Phase 1 Session A (Table 1a), 1–2 sets only. Light. | |
 | Sat | May 2 | Ride | MTB | 1:30 | Z2 | Easy trail ride. 10–12 mi. Fun and flow. | Rain day: 90 min Zwift Z2 free ride. |
-| Sun | May 3 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection or BCBR Club ride. \| Outdoor alt: 60 min Z2 trail ride. |
+| Sun | May 3 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation or BCBR Club ride. \| Outdoor alt: 60 min Z2 trail ride. |
 | **Total** | | | | **5:15** | | | |
 
 ---
@@ -459,9 +474,9 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | May 4 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | May 5 | Strength | Strength | 0:45 | N/A | Phase 2 Race Maintenance (Table 4). 2 sets of 3–5 reps. Heavy but not to failure. | |
+| Tue | May 5 | Strength | Strength | 0:45 | N/A | Phase 2 Race Maintenance (Table 2). 2 sets of 3–5 reps. Heavy but not to failure. | |
 | Wed | May 6 | Ride | Zwift | 1:00 | Z4/Z5 | Opener session. 2×5 min @ 95–100% FTP + 2×2 min @ 110–115% FTP. Rest Z1 between. +15 min WU/CD. | Zwift: Emily's Short Mix or custom Taper Openers. ERG on. \| Outdoor alt: 60 min ride with 2×5 min Z4 + 2×2 min Z5 efforts on climbs. |
-| Thu | May 7 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Endurance collection. \| Outdoor alt: 60 min Z2 trail ride, 8–10 mi. |
+| Thu | May 7 | Ride | Zwift | 1:00 | Z2 | 60-min endurance ride. | Foundation (by duration) or BCBR Club ride. \| Outdoor alt: 60 min Z2 trail ride, 8–10 mi. |
 | Fri | May 8 | Rest | Rest | 0:00 | N/A | Full rest. | |
 | Sat | May 9 | Ride | MTB | 3:00 | Sim | TAPER SIM: 16–20 mi, 3,000 ft elev. 2×10 min Z4, 2×3 min Z5. Keep it controlled – goal is sharpness, not fitness. | Rain day: 2h Zwift. WU → 2×10 min @ 95–100% FTP (5 min rest) → 2×3 min @ 110% FTP (3 min rest) → 30 min Z2 → CD. |
 | Sun | May 10 | Ride | MTB | 2:00 | Z2 | 12–15 mi, 2,000 ft elev. Z2 endurance. | Rain day: 90 min Zwift Z2 free ride. |
@@ -476,9 +491,9 @@ Execute this protocol after every race stage to maximize next-day performance:
 | Day | Date | Session | Type | Dur. | Zone | Details & Targets | Zwift Workout / Alternative |
 |:----|:-----|:--------|:-----|:-----|:-----|:------------------|:----------------------------|
 | Mon | May 11 | Rest | Rest | 0:00 | N/A | Full rest day. | |
-| Tue | May 12 | Strength | Strength | 0:30 | N/A | Phase 2 Race Maintenance (Table 4). Last strength session. | |
+| Tue | May 12 | Strength | Strength | 0:30 | N/A | Phase 2 Race Maintenance (Table 2). Last strength session. | |
 | Wed | May 13 | Ride | Zwift | 0:45 | Z4 | Opener session. 3×3 min @ 95–100% FTP, rest Z1 between. +15 min WU/CD. | Zwift: Custom Openers workout. ERG on. \| Outdoor alt: 45 min ride with 3×3 min Z4 efforts on a familiar climb. |
-| Thu | May 14 | Ride | Zwift | 0:45 | Z2 | 45-min endurance ride. | Endurance collection ~45 min. \| Outdoor alt: 45 min easy trail ride. |
+| Thu | May 14 | Ride | Zwift | 0:45 | Z2 | 45-min endurance ride. | Foundation (~45 min, cut short) or BCBR Club ride. \| Outdoor alt: 45 min easy trail ride. |
 | Fri | May 15 | Rest | Rest | 0:00 | N/A | Full rest. | |
 | Sat | May 16 | Ride | MTB | 1:30 | Z2 | Easy trail ride. Final check of bike. 8–10 mi. Verify all equipment for BCBR. | Rain day: 60 min Zwift Z2 free ride. Make sure bike is packed and race-ready. |
 | Sun | May 17 | Ride | Zwift | 0:45 | Z2/Z4 | Opener session. 45-min ride with 2×3 min @ 95–100% FTP. Last hard efforts before race. | Outdoor alt: 45 min trail ride with 2×3 min Z4 efforts on a familiar climb. |
@@ -524,12 +539,15 @@ Execute this protocol after every race stage to maximize next-day performance:
 
 | Training Goal | Zwift Workout | Collection | When Used |
 |:--------------|:--------------|:-----------|:----------|
-| Sweet Spot (88–93% FTP) | SST (Short) | Sweet Spot | Build 1, Weeks 2–3 |
-| Threshold (95–105% FTP) | Over Unders, The Wringer, 2×20 FTP | Threshold | Build 1–2, Weeks 3–8 |
-| VO2 Max (110–120% FTP) | The Gorby, Tabata | HIIT | Build 2, Weeks 6–8 |
-| MTB-Specific Intervals | Annika Langvad Series (Workouts 2, 4, 5) | Mountain Bike | Build 1–2, Weeks 2–8 |
+| Sweet Spot (88–93% FTP) | Custom (3×12 min @ 88–93%) | Workout Builder | Build 1, Week 2 |
+| Sweet Spot (alt) | SST (Med) — over/under sweet spot blocks | 60–90 min to burn | Build 1, Week 2 |
+| Threshold (95–105% FTP) | 2x15 FTP Intervals (exact for Wk 4) | 30–60 min to burn | Build 1, Week 4 |
+| Threshold (95–105% FTP) | 2x20 FTP Intervals (exact for Wk 7) | 60–90 min to burn | Build 2, Week 7 |
+| Threshold (alt) | Over-Unders — above/below FTP in shorter blocks | Threshold | Build 1, Week 3 |
+| VO2 Max (110–120% FTP) | Custom (6×3 or 5×4 min @ 110–120%) | Workout Builder | Build 2, Weeks 6, 8 |
+| VO2 Max (alt) | The Gorby — 5×5 min @ 110% FTP | 60–90 min to burn | Build 2, Weeks 6, 8 |
 | Microbursts (15s on/off) | Microbursts or custom | HIIT / Custom | Build 2, Weeks 6–8 |
-| Z2 Endurance | Jon's Mix, Foundation | Endurance | All weeks |
+| Z2 Endurance | Foundation | FTP Builder / 30–60 min to burn | All weeks |
 | Climbing (ERG off) | Alpe du Zwift, Road to Sky, Innsbruck KOM | Free ride routes | Alternating Thursdays |
 | Recovery | Free ride Z1, flat route | Recovery | Recovery & taper weeks |
 | Openers | Emily's Short Mix or custom | Various | Taper, Weeks 10–12 |
